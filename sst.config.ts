@@ -11,39 +11,34 @@ export default $config({
     };
   },
   async run() {
-    const vpc =
-      new sst.aws.Vpc("aggietrack", {
-          bastion: true,
-          az: 2,
-          nat: "ec2",
-        });
+    const vpc = new sst.aws.Vpc("aggietrack", {
+      bastion: true,
+      az: 2,
+      nat: "ec2",
+    });
 
     const appDb =
       $app.stage === "production" || $app.stage === "dev"
         ? new sst.aws.Postgres("AppDB", {
-          vpc,
-          proxy: $app.stage === "production" ? true : undefined,
-          instance: "t4g.micro",
-          database: "hackathon",
-          transform: {
-            instance: {
-              skipFinalSnapshot: $app.stage !== "production",
+            vpc,
+            proxy: $app.stage === "production" ? true : undefined,
+            instance: "t4g.micro",
+            database: "hackathon",
+            transform: {
+              instance: {
+                skipFinalSnapshot: $app.stage !== "production",
+              },
             },
-          },
-        })
+          })
         : sst.aws.Postgres.get("AppDB", { id: "hackathon-dev-appdbinstance" });
 
+    const betterAuthSecret = new sst.Secret("BETTER_AUTH_SECRET");
     const googleClientId = new sst.Secret("GOOGLE_CLIENT_ID");
     const googleClientSecret = new sst.Secret("GOOGLE_CLIENT_SECRET");
 
-    new sst.aws.Nextjs("HackathonWeb",
-      {
-        vpc: vpc,
-        link: [
-          appDb,
-          googleClientId,
-          googleClientSecret,
-        ]
-      });
+    new sst.aws.Nextjs("HackathonWeb", {
+      vpc: vpc,
+      link: [appDb, googleClientId, googleClientSecret],
+    });
   },
 });
