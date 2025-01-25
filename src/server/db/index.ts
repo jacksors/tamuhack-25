@@ -1,18 +1,23 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Resource } from "sst";
 
-import { env } from "@/env";
-import * as schema from "./schema";
+const pool = new Pool({
+  database: Resource.AppDB.database,
+  user: Resource.AppDB.username,
+  password: Resource.AppDB.password,
+  host: Resource.AppDB.host,
+  port: Resource.AppDB.port,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
-/**
- * Cache the database connection in development. This avoids creating a new connection on every HMR
- * update.
- */
-const globalForDb = globalThis as unknown as {
-  conn: postgres.Sql | undefined;
+const db = drizzle(pool, { logger: Resource.App.stage !== "production" });
+export default db;
+
+export const enumToPgEnum = <T extends Record<string, any>>(
+  myEnum: T,
+): [T[keyof T], ...T[keyof T][]] => {
+  return Object.values(myEnum).map((value) => `${value}`) as any;
 };
-
-const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
-if (env.NODE_ENV !== "production") globalForDb.conn = conn;
-
-export const db = drizzle(conn, { schema });

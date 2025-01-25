@@ -3,6 +3,7 @@
 
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   doublePrecision,
   index,
   integer,
@@ -12,6 +13,73 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+
+export const usersTable = pgTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  emailVerified: boolean("email_verified").notNull(),
+  emailNotifications: boolean("email_notifications").notNull().default(true),
+  emailBlockedAt: timestamp("email_blocked_at"),
+  pushNotifications: boolean("push_notifications").notNull().default(true),
+  image: text("image"),
+  role: text("role").default("user").notNull(),
+  banned: boolean("banned"),
+  banReason: text("ban_reason"),
+  banExpires: integer("ban_expires"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const sessionsTable = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  impersonatedBy: text("impersonated_by").references(() => usersTable.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const accountsTable = pgTable("accounts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  expiresAt: timestamp("expires_at"),
+  password: text("password"),
+});
+
+export const verificationsTable = pgTable("verifications", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const rateLimitsTable = pgTable("rate_limit", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  lastRequest: integer("last_request").notNull(),
+});
 
 export const vehiclesTable = pgTable("vehicles", {
   make: text("make"),

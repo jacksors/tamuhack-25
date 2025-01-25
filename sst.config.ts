@@ -39,6 +39,7 @@ export default $config({
     new sst.aws.Nextjs("HackathonWeb", {
       vpc: vpc,
       link: [appDb, googleClientId, googleClientSecret],
+      environment: { BETTER_AUTH_URL: "http://localhost:3000" },
     });
 
     return {
