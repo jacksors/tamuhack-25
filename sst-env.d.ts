@@ -13,6 +13,10 @@ declare module "sst" {
       "type": "sst.aws.Postgres"
       "username": string
     }
+    "BETTER_AUTH_SECRET": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "GOOGLE_CLIENT_ID": {
       "type": "sst.sst.Secret"
       "value": string
