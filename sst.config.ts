@@ -40,5 +40,15 @@ export default $config({
       vpc: vpc,
       link: [appDb, googleClientId, googleClientSecret],
     });
+
+    return {
+      database: {
+        host: appDb.host,
+        port: appDb.port,
+        username: appDb.username,
+        password: appDb.password,
+        database: appDb.database,
+      },
+    };
   },
 });
