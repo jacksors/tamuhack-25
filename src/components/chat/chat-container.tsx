@@ -67,7 +67,7 @@ export function ChatContainer() {
         className="relative flex h-full flex-col"
       >
         <div className="bg-dot-pattern absolute inset-0 opacity-5" />
-        <div className="relative flex-1">
+        <div className="relative flex-1 overflow-hidden">
           <ChatMessages messages={typedMessages} isLoading={isLoading} />
         </div>
         <ChatInput
