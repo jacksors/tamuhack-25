@@ -20,6 +20,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-slider": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@types/pg": "^8.11.11",
