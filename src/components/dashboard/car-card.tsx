@@ -10,6 +10,8 @@ import { formatCurrency } from "@/lib/utils";
 import type { VehicleScore } from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
 import { authClient } from "@/lib/auth/client";
+import { useState } from "react";
+import type { User } from "@/lib/auth/index";
 
 interface CarCardProps {
   recommendation: VehicleScore;
@@ -21,8 +23,7 @@ export function CarCard({ recommendation }: CarCardProps) {
   const car = vehicle;
   const router = useRouter();
   const session = authClient.useSession;
-  const user = session?.get().data?.user;
-
+  const user = session.get().data?.user as User;
 
   return (
     <motion.div
@@ -54,13 +55,7 @@ export function CarCard({ recommendation }: CarCardProps) {
                 View Details
               </Button>
             </motion.div>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute right-4 top-4 z-30 bg-background/50 backdrop-blur-sm hover:bg-background"
-            >
-              <Heart className="h-4 w-4 text-primary" />
-            </Button>
+            
             <Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
               {Math.round(totalScore)}% Match
             </Badge>
@@ -123,5 +118,3 @@ export function CarCard({ recommendation }: CarCardProps) {
     </motion.div>
   );
 }
-
-

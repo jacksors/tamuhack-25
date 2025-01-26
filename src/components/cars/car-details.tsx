@@ -96,12 +96,11 @@ export function CarDetails({ car }: CarDetailsProps) {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon">
-                    <Share2 className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
+                  <a href={car.vehicle.url} target="_blank" rel="noreferrer">
+                    <Button variant="outline" size="icon">
+                      <Share2 className="h-5 w-5" />
+                    </Button>
+                  </a>
                 </div>
               </div>
 
@@ -189,7 +188,7 @@ export function CarDetails({ car }: CarDetailsProps) {
                                 .replace(")", "")
                                 .split(" ")
                                 .map((code) => code.trim())
-                            : "000000"
+                            : "000000";
 
                           return isGradient ? (
                             <div

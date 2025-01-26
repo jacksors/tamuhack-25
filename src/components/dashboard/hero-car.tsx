@@ -26,6 +26,7 @@ export function HeroCar({ recommendation }: HeroCarProps) {
   const { vehicle, totalScore, factors, metadata } = recommendation;
 
   const car = vehicle;
+  console.log("Car", car);
 
   return (
     <div className="relative">
@@ -165,18 +166,19 @@ export function HeroCar({ recommendation }: HeroCarProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="flex gap-4 pt-4"
+                  className="flex gap-4 pt-4 w-full"
                 >
-                  <Button className="group flex-1" size="lg">
-                    Schedule Test Drive
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                  <Button variant="outline" size="icon" className="h-12 w-12">
-                    <Heart className="h-5 w-5" />
-                  </Button>
+                  <a href={car.url || "#"} target="_blank" rel="noreferrer" className="group flex-2 w-full">
+                    <Button className="group flex-1 w-full" size="lg">
+                      Schedule Test Drive
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </a>
+                  <a href={car.url} target="_blank" rel="noreferrer" className="group flex-1 w-full">
                   <Button variant="outline" size="icon" className="h-12 w-12">
                     <Share2 className="h-5 w-5" />
                   </Button>
+                  </a>
                 </motion.div>
               </div>
             </div>

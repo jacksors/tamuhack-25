@@ -19,6 +19,8 @@ export const auth = betterAuth({
       account: accountsTable,
       verification: verificationsTable,
     },
+   
+
   }),
   socialProviders: {
     google: {
@@ -26,6 +28,15 @@ export const auth = betterAuth({
       clientSecret: Resource.GOOGLE_CLIENT_SECRET.value,
     },
   },
+   user: {
+      additionalFields: {
+        likes: {
+          type: "string",
+          required: false,
+          defaultValue: "",
+        }
+      },
+    },
 });
 
 export type Session = typeof auth.$Infer.Session;
@@ -36,3 +47,6 @@ export const getAuth = async (): Promise<Session | null> => {
     headers: await headers(),
   });
 };
+
+
+

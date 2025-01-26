@@ -11,6 +11,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { url } from "inspector";
 
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
@@ -26,7 +27,7 @@ export const usersTable = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
-  likes: text("likes"),
+  likes: text("likes").default(""),
 });
 
 export const sessionsTable = pgTable("sessions", {
@@ -197,6 +198,7 @@ export const vehiclesTable = pgTable("vehicles", {
   modelTag: text("model_tag"),
   imageName: text("image_name"),
   imageCount: integer("image_count"),
+  url: text("url"),
 });
 
 export const userPreferencesTable = pgTable("user_preferences", {
