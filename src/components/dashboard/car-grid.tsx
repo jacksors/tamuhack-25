@@ -77,7 +77,7 @@ export function CarGrid({ initialRecommendations }: CarGridProps) {
       >
         {recommendations.map((recommendation) => (
           <motion.div key={recommendation.vehicleId} variants={item}>
-            <CarCard recommendation={recommendation} />
+            <CarCard recommendation={recommendation} key={recommendation.vehicleId} />
           </motion.div>
         ))}
       </motion.div>
