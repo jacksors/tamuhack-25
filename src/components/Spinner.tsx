@@ -8,6 +8,7 @@ interface CarSpinnerProps {
   colorCodes: string;
   imageIndexOverride?: number;
   imageCountOverride?: number;
+  card?: boolean;
 }
 
 const CarSpinner: React.FC<CarSpinnerProps> = ({
@@ -17,8 +18,9 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
   colorCodes,
   imageIndexOverride,
   imageCountOverride,
+  card,
 }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(10);
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [randomColor, setRandomColor] = useState("");
   const [randomModelGrade, setRandomModelGrade] = useState("");
@@ -90,7 +92,9 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
   }, [colorCodes, modelGrade, modelTag]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    console.log("handleMouseMove");
     if (isMouseInside && imageIndexOverride === undefined) {
+
       const { offsetWidth, offsetLeft } = e.currentTarget;
       const relativeX = e.clientX - offsetLeft;
       const percentage = relativeX / offsetWidth + 0.4;
@@ -104,12 +108,12 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
       onMouseEnter={() => setIsMouseInside(true)}
       onMouseLeave={() => setIsMouseInside(false)}
       onMouseMove={handleMouseMove}
-      className="relative h-full w-auto"
+      className={`flex ${card ? "h-full w-auto" : "h-full w-auto"} items-center justify-center overflow-hidden`}
     >
       <img
         src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
         alt="Spinning Car"
-        className="h-full w-full -translate-x-7 object-cover py-12"
+        className={`${card ? "h-full w-full py-12" : "h-[50%]"}`}
       />
     </div>
   );

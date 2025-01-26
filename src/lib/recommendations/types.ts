@@ -1,6 +1,7 @@
 import db from "@/server/db";
 import type { vehiclesTable } from "@/server/db/schema";
 import type { NullableToOptional } from "@/lib/utils";
+import { relations, type InferSelectModel } from "drizzle-orm"
 
 export interface VehicleScore {
   vehicleId: string;
@@ -98,3 +99,5 @@ export interface UserPreferences {
   };
   location?: string;
 }
+
+export type Vehicle = InferSelectModel<typeof vehiclesTable>;

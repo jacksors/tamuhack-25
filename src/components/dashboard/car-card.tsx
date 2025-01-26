@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Heart, Fuel, Gauge } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
@@ -17,16 +18,27 @@ export function CarCard({ recommendation }: CarCardProps) {
   const { vehicle, totalScore, metadata } = recommendation;
 
   const car = vehicle;
+  const router = useRouter();
+
 
   return (
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      onClick={() => router.push(`/cars/${recommendation.vehicleId}`)}
     >
       <Card className="group relative overflow-hidden border-2 bg-gradient-to-b from-background to-muted/20 transition-colors hover:border-primary/50">
         <CardContent className="p-0">
           <div className="flex aspect-[4/3] items-center">
-            <Spinner colorCodes={car.colorCodes ?? ""} model={car.model ?? ""} modelTag={car.modelTag ?? ""} modelGrade={car.modelGrade ?? ""} imageIndexOverride={35} imageCountOverride={car.imageCount} />
+            <Spinner
+              colorCodes={car.colorCodes ?? ""}
+              model={car.model ?? ""}
+              modelTag={car.modelTag ?? ""}
+              modelGrade={car.modelGrade ?? ""}
+              imageIndexOverride={35}
+              imageCountOverride={car.imageCount}
+              card={true}
+            />
             <motion.div
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1 }}
@@ -108,3 +120,5 @@ export function CarCard({ recommendation }: CarCardProps) {
     </motion.div>
   );
 }
+
+
