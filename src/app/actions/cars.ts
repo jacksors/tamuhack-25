@@ -1,4 +1,4 @@
-"use server";
+"use server"
 
 import { getRecommendations } from "./recommendations"
 import db from "@/server/db";
