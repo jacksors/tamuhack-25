@@ -84,13 +84,13 @@ export function calculateFeatureMatch(
 }
 
 export const DEFAULT_WEIGHTS: ScoringWeights = {
-  vehicleType: 1.0,
-  price: 0.9,
-  features: 0.8,
-  passengers: 0.7,
-  fuelType: 0.7,
-  usage: 0.6,
-  location: 0.5,
+  vehicleTypeMatch: 1.0,
+  priceCompatibility: 0.9,
+  featureAlignment: 0.8,
+  passengerFit: 0.7,
+  fuelTypeMatch: 0.7,
+  usageCompatibility: 0.6,
+  locationFactor: 0,
 };
 
 export const DEFAULT_NORMALIZER: ScoreNormalizer = {

@@ -16,9 +16,19 @@ export const scorePassengerCapacity: ScoringFunction = async ({
   weights,
   normalizer,
 }) => {
+  console.log("\n[Passenger Capacity Scoring]");
+  console.log("Desired capacity:", preferences.passengerCount);
+  console.log("Vehicle volumes:", {
+    twoDoor: vehicle["2DoorPassengerVolume"],
+    fourDoor: vehicle["4DoorPassengerVolume"],
+    hatchback: vehicle.hatchbackPassengerVolume,
+  });
   if (!preferences.passengerCount) {
     return {
-      score: normalizeScore(50, { ...normalizer, weight: weights.passengers }),
+      score: normalizeScore(50, {
+        ...normalizer,
+        weight: weights.passengerFit,
+      }),
       metadata: {
         confidence: 1,
       },
@@ -46,7 +56,7 @@ export const scorePassengerCapacity: ScoringFunction = async ({
   return {
     score: normalizeScore(analysis.score, {
       ...normalizer,
-      weight: weights.passengers,
+      weight: weights.passengerFit,
     }),
     metadata: {
       confidence: analysis.confidence,

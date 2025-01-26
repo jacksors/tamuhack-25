@@ -57,9 +57,14 @@ export const scoreUsageCompatibility: ScoringFunction = async ({
   weights,
   normalizer,
 }) => {
+  console.log("\n[Usage Compatibility Scoring]");
+  console.log("Desired usage:", preferences.usage);
   if (!preferences.usage?.length) {
     return {
-      score: normalizeScore(50, { ...normalizer, weight: weights.usage }),
+      score: normalizeScore(50, {
+        ...normalizer,
+        weight: weights.usageCompatibility,
+      }),
       metadata: {
         confidence: 1,
         notes: {},
@@ -81,6 +86,8 @@ export const scoreUsageCompatibility: ScoringFunction = async ({
     preferences.priorities || [],
   );
 
+  console.log("Usage analysis:", analysis.suitability);
+
   // Calculate weighted score based on user's priorities
   const priorityBonus = calculatePriorityBonus(
     preferences.usage,
@@ -100,7 +107,7 @@ export const scoreUsageCompatibility: ScoringFunction = async ({
   return {
     score: normalizeScore(finalScore, {
       ...normalizer,
-      weight: weights.usage,
+      weight: weights.usageCompatibility,
     }),
     metadata: {
       confidence: analysis.confidence,

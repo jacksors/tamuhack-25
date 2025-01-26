@@ -7,6 +7,9 @@ export const scoreVehicleType: ScoringFunction = async ({
   weights,
   normalizer,
 }) => {
+  console.log("\n[Vehicle Type Scoring]");
+  console.log("Preferred types:", preferences.vehicleTypes);
+  console.log("Actual type:", vehicle.vehicleSizeClass);
   if (!preferences.vehicleTypes?.length) {
     return {
       score: 0,
@@ -27,7 +30,7 @@ export const scoreVehicleType: ScoringFunction = async ({
 
     const matchScore = calculateTypeMatchScore(
       preferredType,
-      vehicle.vehicleSizeClass ?? "",
+      vehicle.vehicleSizeClass as string,
     );
     return { score: matchScore, confidence: 0.8 }; // Slightly lower confidence for fuzzy matches
   });
@@ -43,7 +46,7 @@ export const scoreVehicleType: ScoringFunction = async ({
   return {
     score: normalizeScore(bestMatch.score, {
       ...normalizer,
-      weight: weights.vehicleType,
+      weight: weights.vehicleTypeMatch,
     }),
     metadata: {
       confidence: bestMatch.confidence,

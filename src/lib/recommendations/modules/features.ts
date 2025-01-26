@@ -16,9 +16,14 @@ export const scoreFeatureAlignment: ScoringFunction = async ({
   weights,
   normalizer,
 }) => {
+  console.log("\n[Feature Alignment Scoring]");
+  console.log("Desired features:", preferences.features);
   if (!preferences.features?.length) {
     return {
-      score: normalizeScore(50, { ...normalizer, weight: weights.features }),
+      score: normalizeScore(50, {
+        ...normalizer,
+        weight: weights.featureAlignment,
+      }),
       metadata: {
         matching: [],
         missing: [],
@@ -32,6 +37,13 @@ export const scoreFeatureAlignment: ScoringFunction = async ({
   const featureData = await getVehicleFeatures(
     vehicle.year as string,
     vehicle.model as string,
+  );
+
+  console.log(
+    "Available features:",
+    Object.keys(featureData.features).filter(
+      (k) => featureData.features[k]?.available,
+    ),
   );
 
   const analysis = analyzeFeatures(featureData, preferences.features);
@@ -60,7 +72,7 @@ export const scoreFeatureAlignment: ScoringFunction = async ({
   return {
     score: normalizeScore(score, {
       ...normalizer,
-      weight: weights.features,
+      weight: weights.featureAlignment,
     }),
     metadata: {
       matching: analysis.matching,

@@ -54,6 +54,8 @@ export class RecommendationEngine {
     vehicle: NullableToOptional<typeof vehiclesTable.$inferSelect>,
     preferences: UserPreferences,
   ): Promise<VehicleScore> {
+    console.log(`\n[Scoring] ${vehicle.year} ${vehicle.make} ${vehicle.model}`);
+    console.log("Preferences:", JSON.stringify(preferences, null, 2));
     const scoringParams = {
       vehicle,
       preferences,
@@ -87,10 +89,19 @@ export class RecommendationEngine {
       (sum, weight) => sum + weight,
       0,
     );
+
+    console.log(`Total weight: ${totalWeight}`);
+    console.log(`Factors: ${Object.entries(factors)}`);
+
     const totalScore =
       Object.entries(factors).reduce((sum, [key, score]) => {
         const weight = this.weights[key as keyof ScoringWeights];
-        return sum + score * weight;
+        const part = sum + score * weight;
+        console.log(`Sum: ${sum}`);
+        console.log(`Score: ${score}`);
+        console.log(`Weight: ${weight}`);
+        console.log(`Part: ${part}`);
+        return part;
       }, 0) / totalWeight;
 
     // Calculate confidence score using metadata from all modules
@@ -107,6 +118,27 @@ export class RecommendationEngine {
           ([useCase, note]) => `${useCase}: ${note}`,
         )
       : [];
+
+    console.log("\nScoring Results:", {
+      vehicleId: vehicle.id,
+      totalScore,
+      confidenceScore,
+      factors,
+      matchingFeatures: featureScore.metadata?.matching,
+      missingFeatures: featureScore.metadata?.missing,
+      priceAnalysis: {
+        isWithinBudget: priceScore.metadata?.isWithinBudget,
+        percentageFromBudget: priceScore.metadata?.percentageFromBudget,
+      },
+      passengerAnalysis: passengerScore.metadata?.actualCapacity
+        ? {
+            actualCapacity: passengerScore.metadata.actualCapacity,
+            configuration: passengerScore.metadata.configuration,
+            notes: passengerScore.metadata.passengerNotes,
+          }
+        : undefined,
+      usageAnalysis,
+    });
 
     return {
       vehicleId: vehicle.id || "",

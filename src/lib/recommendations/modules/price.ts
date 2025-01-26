@@ -14,6 +14,10 @@ export const scorePriceCompatibility: ScoringFunction = async ({
   weights,
   normalizer,
 }) => {
+  console.log("\n[Price Compatibility Scoring]");
+  console.log("Vehicle price:", vehicle.msrp);
+  console.log("Budget:", preferences.paymentPlan?.budget);
+  console.log("Monthly target:", preferences.paymentPlan?.monthlyPayment);
   const analysis = calculatePriceScore(
     vehicle.msrp || 0,
     preferences.paymentPlan?.budget,
@@ -24,7 +28,7 @@ export const scorePriceCompatibility: ScoringFunction = async ({
   return {
     score: normalizeScore(analysis.score, {
       ...normalizer,
-      weight: weights.price,
+      weight: weights.priceCompatibility,
     }),
     metadata: {
       isWithinBudget: analysis.isWithinBudget,
@@ -53,33 +57,31 @@ function calculatePriceScore(
     const percentageFromBudget = ((vehiclePrice - budget) / budget) * 100;
     const isWithinBudget = vehiclePrice <= budget;
 
-    // Score calculation for cash purchase
-    let score = 100 - Math.abs(percentageFromBudget);
-
-    // Penalty for being over budget
+    // If over budget, return 0
     if (!isWithinBudget) {
-      score *= 0.8; // 20% penalty for being over budget
+      return {
+        score: 0,
+        isWithinBudget: false,
+        percentageFromBudget,
+      };
     }
 
-    // Bonus for being under budget but not too much under
-    if (isWithinBudget && percentageFromBudget > -20) {
-      score *= 1.1; // 10% bonus for being slightly under budget
-    }
+    // Linear penalty for being under budget
+    // Score decreases as the price gets further under budget
+    // Example: If price is 20% under budget, score would be 80
+    const score = 100 - Math.abs(percentageFromBudget);
 
     return {
-      score: Math.max(0, Math.min(100, score)),
-      isWithinBudget,
+      score: Math.max(0, score),
+      isWithinBudget: true,
       percentageFromBudget,
     };
   }
 
   // Handle financing/lease
   if ((paymentType === "finance" || paymentType === "lease") && monthlyTarget) {
-    // Estimated monthly payment calculation
-    // Using a simplified calculation - in reality, this would use more complex formulas
-    // considering interest rates, lease residual values, etc.
-    const interestRate = paymentType === "finance" ? 0.05 : 0.03; // Example rates
-    const term = paymentType === "finance" ? 60 : 36; // 5 years for finance, 3 for lease
+    const interestRate = paymentType === "finance" ? 0.05 : 0.03;
+    const term = paymentType === "finance" ? 60 : 36;
 
     const estimatedMonthly = calculateEstimatedMonthlyPayment(
       vehiclePrice,
@@ -90,22 +92,22 @@ function calculatePriceScore(
       ((estimatedMonthly - monthlyTarget) / monthlyTarget) * 100;
     const isWithinBudget = estimatedMonthly <= monthlyTarget;
 
-    // Score calculation for monthly payments
-    let score = 100 - Math.abs(percentageFromTarget);
-
-    // Penalty for being over monthly target
+    // If over monthly target, return 0
     if (!isWithinBudget) {
-      score *= 0.8;
+      return {
+        score: 0,
+        isWithinBudget: false,
+        percentageFromBudget: percentageFromTarget,
+        estimatedMonthly,
+      };
     }
 
-    // Bonus for being under monthly target but not too much under
-    if (isWithinBudget && percentageFromTarget > -20) {
-      score *= 1.1;
-    }
+    // Linear penalty for being under monthly target
+    const score = 100 - Math.abs(percentageFromTarget);
 
     return {
-      score: Math.max(0, Math.min(100, score)),
-      isWithinBudget,
+      score: Math.max(0, score),
+      isWithinBudget: true,
       percentageFromBudget: percentageFromTarget,
       estimatedMonthly,
     };

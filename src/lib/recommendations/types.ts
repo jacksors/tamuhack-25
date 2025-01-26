@@ -34,13 +34,13 @@ export interface VehicleScore {
 }
 
 export interface ScoringWeights {
-  vehicleType: number;
-  price: number;
-  features: number;
-  passengers: number;
-  fuelType: number;
-  usage: number;
-  location: number;
+  vehicleTypeMatch: number;
+  priceCompatibility: number;
+  featureAlignment: number;
+  passengerFit: number;
+  fuelTypeMatch: number;
+  usageCompatibility: number;
+  locationFactor: number;
 }
 
 export interface ScoreNormalizer {
