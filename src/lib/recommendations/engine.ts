@@ -35,7 +35,6 @@ export class RecommendationEngine {
 
   async getRecommendations(
     preferences: UserPreferences,
-    limit = 10,
   ): Promise<VehicleScore[]> {
     const vehicles = await db
       .select()
