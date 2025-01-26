@@ -1,13 +1,14 @@
-"use server"
+"use server";
 
 import { getRecommendations } from "./recommendations"
 import db from "@/server/db";
 import { sql } from "drizzle-orm";
 import { vehiclesTable } from "@/server/db/schema";
+import { getRecommendations } from "./recommendations";
 
 export async function getCarDetails(id: string) {
-  const recommendations = await getRecommendations(50) // Get a larger pool
-  return recommendations.find((rec) => rec.vehicleId === id)
+  const recommendations = await getRecommendations(); // Get a larger pool
+  return recommendations.find((rec) => rec.vehicleId === id);
 }
 
 export async function getRandomCar(num: number) {
@@ -27,4 +28,3 @@ export async function getRandomCar(num: number) {
     throw new Error("Failed to fetch random car(s). Please try again later.");
   }
 }
-

@@ -9,6 +9,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
@@ -230,3 +231,22 @@ export const vehicleFeaturesCache = pgTable("vehicle_features_cache", {
   confidence: doublePrecision("confidence").notNull(),
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
+
+export const recommendationsCacheTable = pgTable(
+  "recommendations_cache",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    recommendations: jsonb("recommendations").notNull(),
+    lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+    preferencesHash: text("preferences_hash").notNull(),
+  },
+  (table) => ({
+    uniqueIdPreferencesHash: uniqueIndex("unique_id_preferences_hash").on(
+      table.id,
+      table.preferencesHash,
+    ),
+  }),
+);

@@ -6,7 +6,7 @@ import db from "@/server/db";
 import { userPreferencesTable } from "@/server/db/schema";
 import { nanoid } from "nanoid";
 import { getAuth } from "@/lib/auth";
-import { nullableToOptional } from "@/lib/utils";
+import { invalidateRecommendationsCache } from "./recommendations";
 
 const preferencesSchema = z.object({
   vehicleTypes: z.array(z.string()),
@@ -87,6 +87,9 @@ export async function saveUserPreferences(
     });
   }
 
+  // Invalidate recommendations cache when preferences change
+  await invalidateRecommendationsCache(auth.user.id);
+
   return { success: true };
 }
 
@@ -96,13 +99,11 @@ export async function getUserPreferences() {
     return null;
   }
 
-  const preferences = nullableToOptional(
-    await db
-      .select()
-      .from(userPreferencesTable)
-      .where(eq(userPreferencesTable.userId, auth.user.id))
-      .then((rows) => rows[0]),
-  );
+  const preferences = await db
+    .select()
+    .from(userPreferencesTable)
+    .where(eq(userPreferencesTable.userId, auth.user.id))
+    .then((rows) => rows[0]);
 
   if (!preferences) {
     return null;

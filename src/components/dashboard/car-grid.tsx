@@ -41,7 +41,7 @@ export function CarGrid({ initialRecommendations }: CarGridProps) {
 
     setIsLoading(true);
     try {
-      const newRecommendations = await getRecommendations((page + 1) * 12);
+      const newRecommendations = await getRecommendations();
       // Filter out recommendations we already have
       const newItems = newRecommendations.filter(
         (rec) =>
@@ -77,7 +77,10 @@ export function CarGrid({ initialRecommendations }: CarGridProps) {
       >
         {recommendations.map((recommendation) => (
           <motion.div key={recommendation.vehicleId} variants={item}>
-            <CarCard recommendation={recommendation} key={recommendation.vehicleId} />
+            <CarCard
+              recommendation={recommendation}
+              key={recommendation.vehicleId}
+            />
           </motion.div>
         ))}
       </motion.div>
