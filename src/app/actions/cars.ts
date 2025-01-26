@@ -4,7 +4,6 @@ import { getRecommendations } from "./recommendations"
 import db from "@/server/db";
 import { sql } from "drizzle-orm";
 import { vehiclesTable } from "@/server/db/schema";
-import { getRecommendations } from "./recommendations";
 
 export async function getCarDetails(id: string) {
   const recommendations = await getRecommendations(); // Get a larger pool
