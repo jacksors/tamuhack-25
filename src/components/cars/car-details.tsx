@@ -54,8 +54,6 @@ export function CarDetails({ car }: CarDetailsProps) {
               layoutId={`car-image-${car.vehicleId}`}
               className="relative hidden w-1/2 lg:block"
             >
-              <div className="bg-dot-pattern absolute inset-0 opacity-10" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
               <Spinner
                 colorCodes={car.vehicle.colorCodes ?? ""}
                 model={car.vehicle.model ?? ""}
@@ -169,9 +167,9 @@ export function CarDetails({ car }: CarDetailsProps) {
                   <div className="space-y-4">
                     <h2 className="text-lg font-semibold">Key Features</h2>
                     <div className="flex flex-wrap gap-2">
-                      {car.metadata.matchingFeatures.map((feature) => (
+                      {car.metadata.matchingFeatures.map((feature, index) => (
                         <Badge
-                          key={feature}
+                          key={feature + index}
                           variant="secondary"
                           className="bg-primary/10"
                         >

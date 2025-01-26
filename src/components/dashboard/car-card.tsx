@@ -25,7 +25,6 @@ export function CarCard({ recommendation }: CarCardProps) {
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ type: "spring", stiffness: 300, damping: 15 }}
-      onClick={() => router.push(`/cars/${recommendation.vehicleId}`)}
     >
       <Card className="group relative overflow-hidden border-2 bg-gradient-to-b from-background to-muted/20 transition-colors hover:border-primary/50">
         <CardContent className="p-0">
@@ -47,6 +46,7 @@ export function CarCard({ recommendation }: CarCardProps) {
               <Button
                 variant="secondary"
                 className="bg-background/50 backdrop-blur-sm"
+                onClick={() => router.push(`/cars/${recommendation.vehicleId}`)}
               >
                 View Details
               </Button>

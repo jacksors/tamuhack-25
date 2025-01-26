@@ -30,6 +30,10 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
   const [modelName, setModelName] = useState("");
 
   useEffect(() => {
+    setCurrentImageIndex(imageCount - 3);
+  }, [imageCount]);
+
+  useEffect(() => {
     if (
       imageCountOverride !== undefined &&
       imageCountOverride > 0 &&
@@ -105,16 +109,27 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
 
   return (
     <div
-      onMouseEnter={() => setIsMouseInside(true)}
+      onMouseEnter={() => {
+        setIsMouseInside(true);
+        console.log("mouse enter");
+      }}
       onMouseLeave={() => setIsMouseInside(false)}
       onMouseMove={handleMouseMove}
       className={`flex ${card ? "h-full w-auto" : "h-full w-auto"} items-center justify-center overflow-hidden`}
     >
-      <img
-        src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
-        alt="Spinning Car"
-        className={`${card ? "h-full w-full py-12" : "h-[50%]"}`}
-      />
+      {randomColor === "" ||
+      randomModelGrade === "" ||
+      randomModelTag === "" ? (
+        <div className="flex h-full w-full items-center justify-center">
+          <div className="h-1/2 w-1/2 animate-pulse rounded-lg bg-muted" />
+        </div>
+      ) : (
+        <img
+          src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
+          alt="Spinning Car"
+          className={`${card ? "h-full w-full object-cover py-12" : "h-[50%]"} -translate-x-7`}
+        />
+      )}
     </div>
   );
 };
