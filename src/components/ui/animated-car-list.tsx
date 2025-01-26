@@ -4,75 +4,40 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CarPreview } from "./car-preview";
 import { Badge } from "./badge";
-
-const initialCars = [
-  {
-    id: "1",
-    name: "Toyota Camry Hybrid",
-    price: "$27,990",
-    type: "Hybrid Sedan",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: "2",
-    name: "Toyota RAV4 Prime",
-    price: "$32,990",
-    type: "Plug-in Hybrid SUV",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: "3",
-    name: "Toyota Highlander Hybrid",
-    price: "$39,990",
-    type: "Hybrid SUV",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-];
-
-const newMatchCars = [
-  {
-    id: "4",
-    name: "Toyota GR86",
-    price: "$28,400",
-    type: "Sports Car",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: "5",
-    name: "Toyota Corolla Cross",
-    price: "$23,990",
-    type: "Crossover SUV",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: "6",
-    name: "Toyota Crown",
-    price: "$39,900",
-    type: "Luxury Sedan",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-];
+import { getRandomCar } from "@/app/actions/cars";
+import { Vehicle } from "@/lib/recommendations/types";
 
 export function AnimatedCarList() {
-  const [cars, setCars] = useState(initialCars);
+  const [cars, setCars] = useState([]) as any;
   const [recentMatch, setRecentMatch] = useState<string | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const addNewCar = useCallback(() => {
-    const newCar = newMatchCars[currentIndex] as (typeof newMatchCars)[0];
-    setCars((prev) => [newCar, ...prev.slice(0, 2)]);
-    setRecentMatch(newCar.id);
-    setCurrentIndex((prev) => (prev + 1) % newMatchCars.length);
+  const addNewCar = useCallback(async () => {
+    try {
+      const newCar = await getRandomCar(1) as Vehicle;
+      setCars((prev : any) => [newCar, ...prev.slice(0, 2)]);
+      if (newCar) setRecentMatch(newCar.id);
+      setTimeout(() => setRecentMatch(null), 3000);
+    } catch (error) {
+      console.error("Error fetching random car:", error);
+    }
+  }, []);
 
-    // Clear the "Just matched!" badge after 3 seconds
-    setTimeout(() => setRecentMatch(null), 3000);
-  }, [currentIndex]);
+  const fetchInitialCars = useCallback(async () => {
+    try {
+      const newCars = await getRandomCar(3);
+      setCars(newCars);
+    } catch (error) {
+      console.error("Error fetching initial cars:", error);
+    }
+  }, []);
 
   useEffect(() => {
-    // Random interval between 5 and 10 seconds
     const interval = setInterval(() => {
       addNewCar();
     }, 7000);
+
+    // Fetch initial cars
+    fetchInitialCars();
 
     return () => clearInterval(interval);
   }, [addNewCar]);
@@ -80,9 +45,9 @@ export function AnimatedCarList() {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <AnimatePresence mode="popLayout">
-        {cars.map((car) => (
+        {cars.map((car : any) => (
           <motion.div
-            key={car.id}
+            key={car["id"]}
             layout
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -94,10 +59,7 @@ export function AnimatedCarList() {
             className="relative"
           >
             <CarPreview
-              name={car.name}
-              price={car.price}
-              type={car.type}
-              image={car.image}
+              car={car}
             />
             <AnimatePresence>
               {recentMatch === car.id && (

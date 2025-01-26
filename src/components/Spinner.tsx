@@ -9,6 +9,7 @@ interface CarSpinnerProps {
   imageIndexOverride?: number;
   imageCountOverride?: number;
   card?: boolean;
+  noPadding?: boolean;
 }
 
 const CarSpinner: React.FC<CarSpinnerProps> = ({
@@ -19,6 +20,7 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
   imageIndexOverride,
   imageCountOverride,
   card,
+  noPadding,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(10);
   const [isMouseInside, setIsMouseInside] = useState(false);
@@ -127,7 +129,7 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
         <img
           src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
           alt="Spinning Car"
-          className={`${card ? "h-full w-full object-cover py-12" : "h-[50%]"} -translate-x-7`}
+          className={`${card ? "h-full w-full object-cover" : "h-[50%]"} -translate-x-7  ${!noPadding && card ? "py-12" : "py-5"}`}
         />
       )}
     </div>
