@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import { getMoreCars } from "@/app/actions/cars";
+import { getRecommendations } from "@/app/actions/recommendations";
 import { CarCard } from "./car-card";
 import { Loader2 } from "lucide-react";
+import type { VehicleScore } from "@/lib/recommendations/types";
 
 const container = {
   hidden: { opacity: 0 },
@@ -22,8 +23,14 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export function CarGrid() {
-  const [cars, setCars] = useState<any[]>([]);
+interface CarGridProps {
+  initialRecommendations: VehicleScore[];
+}
+
+export function CarGrid({ initialRecommendations }: CarGridProps) {
+  const [recommendations, setRecommendations] = useState<VehicleScore[]>(
+    initialRecommendations,
+  );
   const [page, setPage] = useState(1);
   const [ref, inView] = useInView();
   const [isLoading, setIsLoading] = useState(false);
@@ -34,14 +41,21 @@ export function CarGrid() {
 
     setIsLoading(true);
     try {
-      const newCars = await getMoreCars({ offset: (page - 1) * 12 });
-      if (newCars.length < 12) {
+      const newRecommendations = await getRecommendations((page + 1) * 12);
+      // Filter out recommendations we already have
+      const newItems = newRecommendations.filter(
+        (rec) =>
+          !recommendations.some(
+            (existing) => existing.vehicleId === rec.vehicleId,
+          ),
+      );
+      if (newItems.length === 0) {
         setHasMore(false);
       }
-      setCars((prev) => [...prev, ...newCars]);
+      setRecommendations((prev) => [...prev, ...newItems]);
       setPage((p) => p + 1);
     } catch (error) {
-      console.error("Error loading more cars:", error);
+      console.error("Error loading more recommendations:", error);
     } finally {
       setIsLoading(false);
     }
@@ -61,9 +75,9 @@ export function CarGrid() {
         animate="show"
         className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {cars.map((car) => (
-          <motion.div key={car.id} variants={item}>
-            <CarCard car={car} />
+        {recommendations.map((recommendation) => (
+          <motion.div key={recommendation.vehicleId} variants={item}>
+            <CarCard recommendation={recommendation} />
           </motion.div>
         ))}
       </motion.div>

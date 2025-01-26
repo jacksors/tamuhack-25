@@ -5,6 +5,7 @@ import {
   boolean,
   doublePrecision,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -142,7 +143,7 @@ export const vehiclesTable = pgTable("vehicles", {
   epaHighwayUtilityFactor: text("EPA highway utility factor"),
   hatchbackLuggageVolume: text("Hatchback luggage volume"),
   hatchbackPassengerVolume: text("Hatchback passenger volume"),
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   "2DoorLuggageVolume": text("2 door luggage volume"),
   "4DoorLuggageVolume": text("4 door luggage volume"),
   mpgData: text("MPG Data"),
@@ -218,4 +219,13 @@ export const userPreferencesTable = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
+});
+
+export const vehicleFeaturesCache = pgTable("vehicle_features_cache", {
+  id: text("id").primaryKey(),
+  vehicleId: text("vehicle_id").notNull(),
+  features: jsonb("features").notNull(),
+  source: text("source").notNull(),
+  confidence: doublePrecision("confidence").notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });

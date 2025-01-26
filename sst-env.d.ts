@@ -29,6 +29,10 @@ declare module "sst" {
       "type": "sst.aws.Nextjs"
       "url": string
     }
+    "OPENAI_API_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "aggietrack": {
       "bastion": string
       "type": "sst.aws.Vpc"

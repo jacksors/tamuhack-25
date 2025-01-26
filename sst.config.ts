@@ -5,8 +5,7 @@ export default $config({
   app(input) {
     return {
       name: "tamuhack-25",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
+      removal: "remove",
       home: "aws",
     };
   },
@@ -18,28 +17,42 @@ export default $config({
     });
 
     const appDb =
-      $app.stage === "production" || $app.stage === "dev"
+      $app.stage === "dev"
         ? new sst.aws.Postgres("AppDB", {
             vpc,
-            proxy: $app.stage === "production" ? true : undefined,
             instance: "t4g.micro",
             database: "hackathon",
             transform: {
               instance: {
-                skipFinalSnapshot: $app.stage !== "production",
+                skipFinalSnapshot: true,
               },
             },
           })
-        : sst.aws.Postgres.get("AppDB", { id: "hackathon-dev-appdbinstance" });
+        : sst.aws.Postgres.get("AppDB", {
+            id: "tamuhack-25-dev-appdbinstance",
+          });
 
     const betterAuthSecret = new sst.Secret("BETTER_AUTH_SECRET");
     const googleClientId = new sst.Secret("GOOGLE_CLIENT_ID");
     const googleClientSecret = new sst.Secret("GOOGLE_CLIENT_SECRET");
+    const openaiApiKey = new sst.Secret("OPENAI_API_KEY");
 
     new sst.aws.Nextjs("HackathonWeb", {
       vpc: vpc,
-      link: [appDb, googleClientId, googleClientSecret],
-      environment: { BETTER_AUTH_URL: "http://localhost:3000" },
+      link: [appDb, googleClientId, googleClientSecret, openaiApiKey],
+      environment: {
+        BETTER_AUTH_URL: "http://localhost:3000",
+        BETTER_AUTH_SECRET: betterAuthSecret.value,
+      },
+      domain:
+        $app.stage === "production"
+          ? {
+              name: "dreamdrive.app",
+              redirects: ["www.dreamdrive.app"],
+            }
+          : $app.stage === "dev"
+            ? { name: "dev.dreamdrive.app" }
+            : undefined,
     });
 
     return {

@@ -6,13 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Fuel, Gauge } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import type { VehicleScore } from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
 
 interface CarCardProps {
-  car: any;
+  recommendation: VehicleScore;
 }
 
-export function CarCard({ car }: CarCardProps) {
+export function CarCard({ recommendation }: CarCardProps) {
+  const { vehicle, totalScore, metadata } = recommendation;
+
+  const car = vehicle;
+
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -21,7 +26,7 @@ export function CarCard({ car }: CarCardProps) {
       <Card className="group relative overflow-hidden border-2 bg-gradient-to-b from-background to-muted/20 transition-colors hover:border-primary/50">
         <CardContent className="p-0">
           <div className="flex aspect-[4/3] items-center">
-            <Spinner colorCodes={car.colorCodes} model={car.model} modelTag={car.modelTag} modelGrade={car.modelGrade} imageIndexOverride={35} imageCountOverride={car.imageCount} />
+            <Spinner colorCodes={car.colorCodes ?? ""} model={car.model ?? ""} modelTag={car.modelTag ?? ""} modelGrade={car.modelGrade ?? ""} imageIndexOverride={35} imageCountOverride={car.imageCount} />
             <motion.div
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1 }}
@@ -41,6 +46,9 @@ export function CarCard({ car }: CarCardProps) {
             >
               <Heart className="h-4 w-4 text-primary" />
             </Button>
+            <Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
+              {Math.round(totalScore)}% Match
+            </Badge>
           </div>
           <div className="space-y-4 p-6">
             <div className="space-y-2">
@@ -84,6 +92,15 @@ export function CarCard({ car }: CarCardProps) {
               >
                 {car.vehicleSizeClass || "Mid-Size"}
               </Badge>
+              {metadata.matchingFeatures.slice(0, 3).map((feature) => (
+                <Badge
+                  key={feature}
+                  variant="secondary"
+                  className="bg-primary/10 hover:bg-primary/20"
+                >
+                  {feature}
+                </Badge>
+              ))}
             </div>
           </div>
         </CardContent>
