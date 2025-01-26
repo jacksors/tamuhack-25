@@ -38,6 +38,9 @@ export function ChatStrip() {
         )}
       </AnimatePresence>
 
+      {/* Add placeholder div to maintain space */}
+      {isExpanded && <div className="h-[120px] w-full" />}
+
       {/* Chat Container */}
       <motion.div
         layout
@@ -52,7 +55,7 @@ export function ChatStrip() {
         }}
         className={cn(
           "relative z-50 mx-auto max-w-6xl",
-          isExpanded ? "absolute inset-4 top-44" : "w-full",
+          isExpanded ? "fixed inset-x-4 -top-6" : "w-full",
         )}
       >
         <Card
