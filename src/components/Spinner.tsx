@@ -47,7 +47,7 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
     ) {
       setCurrentImageIndex(imageIndexOverride);
     } else if (imageIndexOverride !== undefined) {
-      setCurrentImageIndex(1);
+      setCurrentImageIndex(17);
     }
   }, [imageIndexOverride, imageCount]);
 
@@ -109,7 +109,7 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
       <img
         src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
         alt="Spinning Car"
-        className="h-full w-full -translate-x-7 object-cover py-9"
+        className="h-full w-full -translate-x-7 object-cover py-12"
       />
     </div>
   );
