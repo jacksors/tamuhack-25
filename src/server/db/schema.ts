@@ -5,6 +5,7 @@ import {
   boolean,
   doublePrecision,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -218,4 +219,13 @@ export const userPreferencesTable = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
+});
+
+export const vehicleFeaturesCache = pgTable("vehicle_features_cache", {
+  id: text("id").primaryKey(),
+  vehicleId: text("vehicle_id").notNull(),
+  features: jsonb("features").notNull(),
+  source: text("source").notNull(),
+  confidence: doublePrecision("confidence").notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
