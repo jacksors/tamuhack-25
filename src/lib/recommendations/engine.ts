@@ -17,6 +17,7 @@ import { scoreUsageCompatibility } from "./modules/usage";
 import db from "@/server/db";
 import { desc } from "drizzle-orm";
 import { vehiclesTable } from "@/server/db/schema";
+import { nullableToOptional, NullableToOptional } from "@/lib/utils";
 
 export class RecommendationEngine {
   private weights: ScoringWeights;
@@ -41,14 +42,16 @@ export class RecommendationEngine {
       .limit(limit * 2);
 
     const scores = await Promise.all(
-      vehicles.map((vehicle) => this.scoreVehicle(vehicle, preferences)),
+      vehicles
+        .map(nullableToOptional)
+        .map((vehicle) => this.scoreVehicle(vehicle, preferences)),
     );
 
     return scores.sort((a, b) => b.totalScore - a.totalScore).slice(0, limit);
   }
 
   private async scoreVehicle(
-    vehicle: any,
+    vehicle: NullableToOptional<typeof vehiclesTable.$inferSelect>,
     preferences: UserPreferences,
   ): Promise<VehicleScore> {
     const scoringParams = {
@@ -106,7 +109,8 @@ export class RecommendationEngine {
       : [];
 
     return {
-      vehicleId: vehicle.id,
+      vehicleId: vehicle.id || "",
+      vehicle, // Include the full vehicle data
       totalScore,
       confidenceScore,
       factors,

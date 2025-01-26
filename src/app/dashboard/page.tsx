@@ -1,11 +1,18 @@
 import { Suspense } from "react";
-import { getTopCarMatch } from "../actions/cars";
+import { getRecommendations } from "../actions/recommendations";
 import { HeroCar } from "@/components/dashboard/hero-car";
 import { CarGrid } from "@/components/dashboard/car-grid";
 import { Car } from "lucide-react";
+import { VehicleScore } from "@/lib/recommendations/types";
 
 export default async function DashboardPage() {
-  const topMatch = await getTopCarMatch();
+  // Get top 10 recommendations
+  const recommendations = await getRecommendations(10);
+  const topMatch = recommendations;
+
+  if (!recommendations.length) {
+    throw new Error("No recommendations found");
+  }
 
   return (
     <main className="min-h-screen pb-20">
@@ -13,11 +20,11 @@ export default async function DashboardPage() {
         <div className="space-y-12">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold tracking-tight">
-              Your Perfect Match
+              Your Perfect Toyota Match
             </h1>
             <p className="max-w-3xl text-xl text-muted-foreground">
-              Based on your preferences, we've found the ideal Toyota that
-              matches your lifestyle and requirements
+              Based on your preferences, we've found these ideal Toyota models
+              that match your lifestyle and requirements
             </p>
           </div>
 
@@ -26,7 +33,7 @@ export default async function DashboardPage() {
               <div className="h-[600px] animate-pulse rounded-lg bg-muted" />
             }
           >
-            <HeroCar car={topMatch} matchScore={topMatch.matchScore} />
+            <HeroCar recommendation={topMatch[0] as VehicleScore} />
           </Suspense>
 
           <div className="space-y-8">
@@ -47,7 +54,7 @@ export default async function DashboardPage() {
                 <div className="h-[400px] animate-pulse rounded-lg bg-muted" />
               }
             >
-              <CarGrid />
+              <CarGrid initialRecommendations={recommendations.slice(1)} />
             </Suspense>
           </div>
         </div>

@@ -35,10 +35,11 @@ export default $config({
     const betterAuthSecret = new sst.Secret("BETTER_AUTH_SECRET");
     const googleClientId = new sst.Secret("GOOGLE_CLIENT_ID");
     const googleClientSecret = new sst.Secret("GOOGLE_CLIENT_SECRET");
+    const openaiApiKey = new sst.Secret("OPENAI_API_KEY");
 
     new sst.aws.Nextjs("HackathonWeb", {
       vpc: vpc,
-      link: [appDb, googleClientId, googleClientSecret],
+      link: [appDb, googleClientId, googleClientSecret, openaiApiKey],
       environment: {
         BETTER_AUTH_URL: "http://localhost:3000",
         BETTER_AUTH_SECRET: betterAuthSecret.value,

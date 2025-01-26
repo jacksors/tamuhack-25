@@ -1,16 +1,11 @@
-import OpenAI from "openai";
 import { nanoid } from "nanoid";
 import db from "@/server/db";
 import { vehicleFeaturesCache } from "@/server/db/schema";
 import { and, eq, gt } from "drizzle-orm";
 import type { VehicleFeatures } from "../types";
 import { USAGE_ANALYSIS_PROMPT } from "@/lib/recommendations/modules/usage";
+import { createChatCompletion } from "@/lib/openai/client";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Define features exactly as they appear in onboarding
 const featureDefinitions = {
   // Safety & Assistance
   awd: "All-wheel drive (AWD) system",
@@ -66,9 +61,8 @@ export async function getVehicleFeatures(
   try {
     // Get both feature and usage analysis in parallel
     const [featureCompletion, usageCompletion] = await Promise.all([
-      openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
+      createChatCompletion(
+        [
           {
             role: "system",
             content:
@@ -79,11 +73,10 @@ export async function getVehicleFeatures(
             content: generateFeaturePrompt(year, model),
           },
         ],
-        temperature: 0.1,
-      }),
-      openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
+        { estimatedTokens: 2000 },
+      ),
+      createChatCompletion(
+        [
           {
             role: "system",
             content:
@@ -94,8 +87,8 @@ export async function getVehicleFeatures(
             content: `For the ${year} Toyota ${model}:\n${USAGE_ANALYSIS_PROMPT}`,
           },
         ],
-        temperature: 0.1,
-      }),
+        { estimatedTokens: 2000 },
+      ),
     ]);
 
     const featureResponse = featureCompletion.choices[0]?.message?.content;
@@ -132,38 +125,37 @@ export async function getVehicleFeatures(
   }
 }
 
-// Helper function to generate the feature prompt
 function generateFeaturePrompt(year: string, model: string): string {
   const prompt = `
-      Analyze the ${year} Toyota ${model} and determine which of these specific features it has.
-      Only respond about these exact features - do not include any additional features.
-      
-      For each feature, provide:
-      - Whether it's available (true/false)
-      - Confidence in the answer (0-1)
-      - Optional notes about trim levels or conditions
-      
-      Features to analyze:
-      ${Object.entries(featureDefinitions)
-        .map(([key, desc]) => `${key}: ${desc}`)
-        .join("\n")}
-      
-      Format the response as a JSON object with this structure:
-      {
-        "features": {
-          "feature-name": {
-            "available": boolean,
-            "confidence": number,
-            "notes": string (optional)
-          }
-        },
-        "trim_levels": string[] (optional),
-        "standard_or_optional": "standard" | "optional" | "varies_by_trim"
-      }
-      
-      Only mark a feature as available if you are confident it exists for this specific model year.
-      If you're unsure, set confidence lower and provide notes about your uncertainty.
-      If a feature is only available on certain trims, mark it as available but note which trims in the notes field.
-    `;
+    Analyze the ${year} Toyota ${model} and determine which of these specific features it has.
+    Only respond about these exact features - do not include any additional features.
+    
+    For each feature, provide:
+    - Whether it's available (true/false)
+    - Confidence in the answer (0-1)
+    - Optional notes about trim levels or conditions
+    
+    Features to analyze:
+    ${Object.entries(featureDefinitions)
+      .map(([key, desc]) => `${key}: ${desc}`)
+      .join("\n")}
+    
+    Format the response as a JSON object with this structure:
+    {
+      "features": {
+        "feature-name": {
+          "available": boolean,
+          "confidence": number,
+          "notes": string (optional)
+        }
+      },
+      "trim_levels": string[] (optional),
+      "standard_or_optional": "standard" | "optional" | "varies_by_trim"
+    }
+    
+    Only mark a feature as available if you are confident it exists for this specific model year.
+    If you're unsure, set confidence lower and provide notes about your uncertainty.
+    If a feature is only available on certain trims, mark it as available but note which trims in the notes field.
+  `;
   return prompt;
 }

@@ -15,14 +15,18 @@ import {
   Star,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import type { VehicleScore } from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
 
 interface HeroCarProps {
-  car: any;
-  matchScore: number;
+  recommendation: VehicleScore;
 }
 
-export function HeroCar({ car, matchScore }: HeroCarProps) {
+export function HeroCar({ recommendation }: HeroCarProps) {
+  const { vehicle, totalScore, factors, metadata } = recommendation;
+
+  const car = vehicle;
+
   return (
     <div className="relative">
       <motion.div
@@ -37,10 +41,10 @@ export function HeroCar({ car, matchScore }: HeroCarProps) {
                 <div className="bg-dot-pattern absolute inset-0 opacity-10" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
                 <Spinner
-                  colorCodes={car.colorCodes}
-                  model={car.model}
-                  modelTag={car.modelTag}
-                  modelGrade={car.modelGrade}
+                  colorCodes={car.colorCodes ?? ""}
+                  model={car.model ?? ""}
+                  modelTag={car.modelTag ?? ""}
+                  modelGrade={car.modelGrade ?? ""}
                   imageIndexOverride={35}
                   imageCountOverride={car.imageCount}
                 />
@@ -62,7 +66,7 @@ export function HeroCar({ car, matchScore }: HeroCarProps) {
                     variant="outline"
                   >
                     <Star className="h-4 w-4 fill-primary text-primary" />
-                    {matchScore}% Match
+                    {Math.round(totalScore)}% Match
                   </Badge>
                 </motion.div>
               </div>
@@ -119,26 +123,48 @@ export function HeroCar({ car, matchScore }: HeroCarProps) {
                     <div className="text-sm text-muted-foreground">Drive</div>
                     <div className="flex items-center gap-2">
                       <Car className="h-5 w-5 text-primary" />
-                      <span className="font-medium">{car.drive || "FWD"}</span>
+                      <span className="font-medium">
+                        {vehicle.drive || "FWD"}
+                      </span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="text-sm text-muted-foreground">
-                      Size Class
+                      Passengers
                     </div>
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-primary" />
                       <span className="font-medium">
-                        {car.vehicleSizeClass || "Mid-Size"}
+                        {metadata.passengerAnalysis?.actualCapacity ||
+                          vehicle.vehicleSizeClass}
                       </span>
                     </div>
                   </div>
                 </motion.div>
 
+                {metadata.matchingFeatures.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-wrap gap-2"
+                  >
+                    {metadata.matchingFeatures.map((feature) => (
+                      <Badge
+                        key={feature}
+                        variant="outline"
+                        className="bg-primary/10"
+                      >
+                        {feature}
+                      </Badge>
+                    ))}
+                  </motion.div>
+                )}
+
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.6 }}
                   className="flex gap-4 pt-4"
                 >
                   <Button className="group flex-1" size="lg">

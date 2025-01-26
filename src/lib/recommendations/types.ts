@@ -1,9 +1,10 @@
 import db from "@/server/db";
-import { vehiclesTable } from "@/server/db/schema";
-import { NullableToOptional } from "@/lib/utils";
+import type { vehiclesTable } from "@/server/db/schema";
+import type { NullableToOptional } from "@/lib/utils";
 
 export interface VehicleScore {
   vehicleId: string;
+  vehicle: NullableToOptional<typeof vehiclesTable.$inferSelect>;
   totalScore: number;
   confidenceScore: number;
   factors: {

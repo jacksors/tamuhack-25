@@ -143,7 +143,7 @@ export const vehiclesTable = pgTable("vehicles", {
   epaHighwayUtilityFactor: text("EPA highway utility factor"),
   hatchbackLuggageVolume: text("Hatchback luggage volume"),
   hatchbackPassengerVolume: text("Hatchback passenger volume"),
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   "2DoorLuggageVolume": text("2 door luggage volume"),
   "4DoorLuggageVolume": text("4 door luggage volume"),
   mpgData: text("MPG Data"),

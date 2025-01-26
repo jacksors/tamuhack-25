@@ -6,6 +6,7 @@ import db from "@/server/db";
 import { userPreferencesTable } from "@/server/db/schema";
 import { nanoid } from "nanoid";
 import { getAuth } from "@/lib/auth";
+import { nullableToOptional } from "@/lib/utils";
 
 const preferencesSchema = z.object({
   vehicleTypes: z.array(z.string()),
@@ -95,11 +96,13 @@ export async function getUserPreferences() {
     return null;
   }
 
-  const preferences = await db
-    .select()
-    .from(userPreferencesTable)
-    .where(eq(userPreferencesTable.userId, auth.user.id))
-    .then((rows) => rows[0]);
+  const preferences = nullableToOptional(
+    await db
+      .select()
+      .from(userPreferencesTable)
+      .where(eq(userPreferencesTable.userId, auth.user.id))
+      .then((rows) => rows[0]),
+  );
 
   if (!preferences) {
     return null;

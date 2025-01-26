@@ -21,3 +21,22 @@ export type NullableToOptional<T> = {
   // Retain keys that do not include null
   [K in keyof T as null extends T[K] ? never : K]: T[K];
 };
+
+export function nullableToOptional<T>(obj: T): NullableToOptional<T> {
+  const result = {} as NullableToOptional<T>;
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+
+      // Check if the value is not null
+      if (value !== null) {
+        // @ts-expect-error: We ensure type safety through the utility type
+        result[key] = value;
+      }
+      // If the value is null, omit the property (make it optional)
+    }
+  }
+
+  return result;
+}
