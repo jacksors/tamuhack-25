@@ -4,6 +4,7 @@ import { HeroCar } from "@/components/dashboard/hero-car";
 import { CarGrid } from "@/components/dashboard/car-grid";
 import { Car } from "lucide-react";
 import { VehicleScore } from "@/lib/recommendations/types";
+import { ChatStrip } from "@/components/dashboard/chat-strip";
 
 export default async function DashboardPage() {
   // Get top 10 recommendations
@@ -35,6 +36,8 @@ export default async function DashboardPage() {
           >
             <HeroCar recommendation={topMatch[0] as VehicleScore} />
           </Suspense>
+
+          <ChatStrip />
 
           <div className="space-y-8">
             <div className="flex items-end justify-between border-b pb-4">
