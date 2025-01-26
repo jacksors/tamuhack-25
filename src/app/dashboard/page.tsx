@@ -7,7 +7,7 @@ import { VehicleScore } from "@/lib/recommendations/types";
 
 export default async function DashboardPage() {
   // Get top 10 recommendations
-  const recommendations = await getRecommendations(10);
+  const recommendations = await getRecommendations();
   const topMatch = recommendations;
 
   if (!recommendations.length) {
