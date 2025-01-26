@@ -41,7 +41,7 @@ export default $config({
       vpc: vpc,
       link: [appDb, googleClientId, googleClientSecret, openaiApiKey],
       environment: {
-        BETTER_AUTH_URL: "http://localhost:3000",
+        BETTER_AUTH_URL: "https://dreamdrive.app",
         BETTER_AUTH_SECRET: betterAuthSecret.value,
       },
       domain:
