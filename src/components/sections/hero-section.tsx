@@ -1,8 +1,9 @@
-import { CarFinderForm } from "@/components/ui/car-finder-form";
+import { AnimatedCTA } from "@/components/ui/animated-cta";
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
-    <section className="relative pb-32 pt-20">
+    <section className="relative pb-16 pt-12">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">
@@ -11,13 +12,16 @@ export function HeroSection() {
               <span className="text-primary">DreamDrive</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-              Your perfect Toyota match is waiting. Let our AI-powered system
-              find your ideal vehicle based on your unique preferences and
-              lifestyle.
+              Discover the perfect Toyota for your lifestyle with our
+              intelligent car matching system. Experience seamless car shopping
+              like never before.
             </p>
           </div>
-          <div className="mt-8 w-full max-w-4xl">
-            <CarFinderForm />
+          <div className="flex flex-col items-center gap-4 pt-4 sm:flex-row">
+            <AnimatedCTA />
+            <Button variant="outline" size="lg">
+              Learn More
+            </Button>
           </div>
         </div>
       </div>

@@ -1,17 +1,13 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
 import {
   boolean,
   doublePrecision,
-  index,
   integer,
   pgTable,
-  pgTableCreator,
   text,
   timestamp,
-  varchar,
 } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
@@ -19,9 +15,6 @@ export const usersTable = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   emailVerified: boolean("email_verified").notNull(),
-  emailNotifications: boolean("email_notifications").notNull().default(true),
-  emailBlockedAt: timestamp("email_blocked_at"),
-  pushNotifications: boolean("push_notifications").notNull().default(true),
   image: text("image"),
   role: text("role").default("user").notNull(),
   banned: boolean("banned"),
@@ -184,4 +177,31 @@ export const vehiclesTable = pgTable("vehicles", {
   phevHighway: text("PHEV Highway"),
   phevCombined: text("PHEV Combined"),
   basemodel: text("basemodel"),
+  msrp: doublePrecision("msrp"),
+  hasAnimation: boolean("hasAnimation"),
+  animationImageFolder: text("animationImageFolder"),
+});
+
+export const userPreferencesTable = pgTable("user_preferences", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  vehicleTypes: text("vehicle_types").array(),
+  otherVehicleType: text("other_vehicle_type"),
+  usage: text("usage").array(),
+  priorities: text("priorities").array(),
+  features: text("features").array(),
+  fuelPreference: text("fuel_preference"),
+  passengerCount: integer("passenger_count"),
+  paymentPlan: text("payment_plan").notNull(),
+  paymentBudget: integer("payment_budget"),
+  paymentMonthly: integer("payment_monthly"),
+  creditScore: text("credit_score"),
+  paymentDownPayment: integer("payment_down_payment"),
+  location: text("location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => new Date())
+    .notNull(),
 });

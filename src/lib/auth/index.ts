@@ -8,6 +8,7 @@ import {
   verificationsTable,
 } from "@/server/db/schema";
 import db from "@/server/db";
+import { headers } from "next/headers";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -26,3 +27,12 @@ export const auth = betterAuth({
     },
   },
 });
+
+export type Session = typeof auth.$Infer.Session;
+export type User = Session["user"];
+
+export const getAuth = async (): Promise<Session | null> => {
+  return auth.api.getSession({
+    headers: await headers(),
+  });
+};
