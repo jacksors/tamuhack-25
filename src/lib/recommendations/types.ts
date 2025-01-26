@@ -19,7 +19,7 @@ export interface VehicleScore {
   metadata: {
     matchingFeatures: string[];
     missingFeatures: string[];
-    featureNotes: Record<string, string>;
+    featureNotes: string[];
     priceAnalysis: {
       isWithinBudget: boolean;
       percentageFromBudget: number;
@@ -54,7 +54,7 @@ export interface ScoringResult {
   metadata?: {
     matching?: string[];
     missing?: string[];
-    notes?: Record<string, string>;
+    notes?: string[];
     isWithinBudget?: boolean;
     percentageFromBudget?: number;
     confidence?: number;
@@ -66,7 +66,7 @@ export interface ScoringResult {
       {
         score: number;
         confidence: number;
-        notes: string;
+        notes: string[];
       }
     >;
   };

@@ -1,20 +1,19 @@
 import type { ScoringFunction } from "../types";
-import { normalizeScore } from "../utils";
 import { getVehicleFeatures } from "@/lib/vehicle-data/sources/openai";
 
 interface PassengerAnalysis {
-  score: number;
-  confidence: number;
+  score: number; // 0 to 1
+  confidence: number; // 0 to 1
   actualCapacity: number;
   configuration: string;
-  passengerNotes: string;
+  notes: string[];
+  flexibilityScore: number; // 0 to 1
+  comfortScore: number; // 0 to 1
 }
 
 export const scorePassengerCapacity: ScoringFunction = async ({
   vehicle,
   preferences,
-  weights,
-  normalizer,
 }) => {
   console.log("\n[Passenger Capacity Scoring]");
   console.log("Desired capacity:", preferences.passengerCount);
@@ -23,19 +22,20 @@ export const scorePassengerCapacity: ScoringFunction = async ({
     fourDoor: vehicle["4DoorPassengerVolume"],
     hatchback: vehicle.hatchbackPassengerVolume,
   });
+
   if (!preferences.passengerCount) {
     return {
-      score: normalizeScore(50, {
-        ...normalizer,
-        weight: weights.passengerFit,
-      }),
+      score: 0.5, // Neutral score
       metadata: {
         confidence: 1,
+        actualCapacity: 5, // Default capacity
+        configuration: "standard",
+        notes: ["No passenger capacity preference specified"],
       },
     };
   }
 
-  // Get feature data from OpenAI, including third row information
+  // Get feature data for third row and seating configuration
   const featureData = await getVehicleFeatures(
     vehicle.year as string,
     vehicle.model as string,
@@ -44,134 +44,170 @@ export const scorePassengerCapacity: ScoringFunction = async ({
   const thirdRowConfidence =
     featureData.features["third-row"]?.confidence || 0.7;
 
-  const analysis = calculatePassengerScore(
+  const analysis = analyzePassengerCapacity(
     preferences.passengerCount,
-    vehicle["2DoorPassengerVolume"],
-    vehicle["4DoorPassengerVolume"],
-    vehicle.hatchbackPassengerVolume,
+    {
+      twoDoorVolume: vehicle["2DoorPassengerVolume"],
+      fourDoorVolume: vehicle["4DoorPassengerVolume"],
+      hatchbackVolume: vehicle.hatchbackPassengerVolume,
+    },
     hasThirdRow,
     thirdRowConfidence,
   );
 
+  console.log("Passenger capacity analysis:", analysis);
+
   return {
-    score: normalizeScore(analysis.score, {
-      ...normalizer,
-      weight: weights.passengerFit,
-    }),
+    score: analysis.score,
     metadata: {
       confidence: analysis.confidence,
       actualCapacity: analysis.actualCapacity,
       configuration: analysis.configuration,
-      passengerNotes: analysis.passengerNotes,
+      notes: analysis.notes,
+      flexibilityScore: analysis.flexibilityScore,
+      comfortScore: analysis.comfortScore,
     },
   };
 };
 
-function calculatePassengerScore(
-  desiredCount: number,
-  twoDoorVolume?: string,
-  fourDoorVolume?: string,
-  hatchbackVolume?: string,
-  hasThirdRow?: boolean,
-  thirdRowConfidence = 0.7,
-): PassengerAnalysis {
-  // Convert passenger volumes to estimated capacities
-  // Industry standard: ~55 cubic feet per passenger for comfort
-  const standardVolumePerPassenger = 55;
+interface VehicleVolumes {
+  twoDoorVolume?: string | null;
+  fourDoorVolume?: string | null;
+  hatchbackVolume?: string | null;
+}
 
+function analyzePassengerCapacity(
+  desiredCount: number,
+  volumes: VehicleVolumes,
+  hasThirdRow: boolean,
+  thirdRowConfidence: number,
+): PassengerAnalysis {
+  const standardVolumePerPassenger = 55; // cubic feet
   const configurations: Array<{
     type: string;
     volume: number;
-    estimatedCapacity: number;
+    capacity: number;
+    comfort: number;
     confidence: number;
   }> = [];
 
   // Process each available configuration
-  if (twoDoorVolume) {
+  if (volumes.twoDoorVolume) {
+    const volume = Number(volumes.twoDoorVolume);
     configurations.push({
       type: "2-door",
-      volume: Number.parseFloat(twoDoorVolume),
-      estimatedCapacity: Math.round(
-        Number.parseFloat(twoDoorVolume) / standardVolumePerPassenger,
-      ),
+      volume,
+      capacity: Math.round(volume / standardVolumePerPassenger),
+      comfort: calculateComfortScore(volume, 2),
       confidence: 0.9,
     });
   }
 
-  if (fourDoorVolume) {
+  if (volumes.fourDoorVolume) {
+    const volume = Number(volumes.fourDoorVolume);
     configurations.push({
       type: "4-door",
-      volume: Number.parseFloat(fourDoorVolume),
-      estimatedCapacity: Math.round(
-        Number.parseFloat(fourDoorVolume) / standardVolumePerPassenger,
-      ),
+      volume,
+      capacity: Math.round(volume / standardVolumePerPassenger),
+      comfort: calculateComfortScore(volume, 4),
       confidence: 0.9,
     });
   }
 
-  if (hatchbackVolume) {
+  if (volumes.hatchbackVolume) {
+    const volume = Number(volumes.hatchbackVolume);
     configurations.push({
       type: "hatchback",
-      volume: Number.parseFloat(hatchbackVolume),
-      estimatedCapacity: Math.round(
-        Number.parseFloat(hatchbackVolume) / standardVolumePerPassenger,
-      ),
+      volume,
+      capacity: Math.round(volume / standardVolumePerPassenger),
+      comfort: calculateComfortScore(volume, 4),
       confidence: 0.9,
     });
   }
 
-  // If no volume data available, use basic estimation based on vehicle class and third row info
+  // If no volume data, estimate based on third row
   if (configurations.length === 0) {
-    let defaultCapacity = 5; // Base capacity for most vehicles
-    let confidence = 0.7; // Base confidence for estimated capacity
-
-    if (hasThirdRow) {
-      defaultCapacity = 7; // Increase capacity for third row vehicles
-      confidence = thirdRowConfidence; // Use the confidence from OpenAI's feature detection
-    }
-
+    const estimatedCapacity = hasThirdRow ? 7 : 5;
     configurations.push({
       type: "estimated",
-      volume: defaultCapacity * standardVolumePerPassenger,
-      estimatedCapacity: defaultCapacity,
-      confidence,
+      volume: estimatedCapacity * standardVolumePerPassenger,
+      capacity: estimatedCapacity,
+      comfort: hasThirdRow ? 0.8 : 0.9,
+      confidence: thirdRowConfidence,
     });
   }
 
-  // Find the best matching configuration
-  const bestConfig = configurations.reduce(
-    (best, current) => {
-      const currentDiff = Math.abs(current.estimatedCapacity - desiredCount);
-      const bestDiff = Math.abs(best.estimatedCapacity - desiredCount);
-      return currentDiff < bestDiff ? current : best;
-    },
-    configurations[0] as (typeof configurations)[0],
+  // Find best configuration for desired capacity
+  const bestConfig = configurations.reduce((best, current) => {
+    const currentDiff = Math.abs(current.capacity - desiredCount);
+    const bestDiff = Math.abs(best.capacity - desiredCount);
+    return currentDiff < bestDiff ? current : best;
+  });
+
+  // Calculate base score from capacity match
+  const capacityDiff = Math.abs(bestConfig.capacity - desiredCount);
+  const baseScore = Math.max(0, 1 - capacityDiff / desiredCount);
+
+  // Calculate flexibility score
+  const flexibilityScore = calculateFlexibilityScore(
+    configurations,
+    desiredCount,
   );
 
-  // Calculate score based on how well the best configuration matches
-  const capacityDiff = Math.abs(bestConfig.estimatedCapacity - desiredCount);
-  let score = 100 - capacityDiff * 20; // -20 points per passenger difference
+  // Comfort score from best configuration
+  const comfortScore = bestConfig.comfort;
 
-  // Bonus for exact match
-  if (capacityDiff === 0) {
-    score *= 1.2; // 20% bonus
+  // Apply adjustments
+  let finalScore = baseScore;
+
+  // Penalty if capacity is insufficient
+  if (bestConfig.capacity < desiredCount) {
+    finalScore *= 0.8; // 20% penalty
   }
 
-  // Penalty if best capacity is less than desired
-  if (bestConfig.estimatedCapacity < desiredCount) {
-    score *= 0.8; // 20% penalty for being too small
-  }
+  // Bonus for flexibility
+  finalScore = Math.min(finalScore * (1 + flexibilityScore * 0.2), 1);
 
-  // Generate explanatory notes
-  const passengerNotes = `${bestConfig.type} configuration with estimated capacity of ${
-    bestConfig.estimatedCapacity
-  } passengers${hasThirdRow ? " (includes third row seating)" : ""}`;
+  // Comfort adjustment
+  finalScore = Math.min(finalScore * (0.8 + comfortScore * 0.2), 1);
+
+  const notes = [
+    `${bestConfig.type} configuration with ${bestConfig.capacity} passenger capacity`,
+    `Comfort rating: ${Math.round(comfortScore * 100)}%`,
+    `Flexibility score: ${Math.round(flexibilityScore * 100)}%`,
+  ];
+
+  if (hasThirdRow) {
+    notes.push("Includes third row seating");
+  }
 
   return {
-    score: Math.max(0, Math.min(100, score)),
+    score: finalScore,
     confidence: bestConfig.confidence,
-    actualCapacity: bestConfig.estimatedCapacity,
+    actualCapacity: bestConfig.capacity,
     configuration: bestConfig.type,
-    passengerNotes,
+    notes,
+    flexibilityScore,
+    comfortScore,
   };
+}
+
+function calculateComfortScore(volume: number, doors: number): number {
+  const baseComfort = Math.min(volume / (55 * doors), 1); // 55 cubic feet per passenger ideal
+  const doorBonus = doors === 4 ? 0.1 : 0; // 10% bonus for 4-door configuration
+  return Math.min(baseComfort + doorBonus, 1);
+}
+
+function calculateFlexibilityScore(
+  configurations: Array<{ capacity: number; comfort: number }>,
+  desiredCount: number,
+): number {
+  if (configurations.length === 1) return 0;
+
+  // Calculate how many configurations can handle the desired capacity comfortably
+  const viableConfigs = configurations.filter(
+    (config) => config.capacity >= desiredCount && config.comfort >= 0.7,
+  );
+
+  return Math.min(viableConfigs.length / configurations.length, 1);
 }
