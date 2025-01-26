@@ -9,6 +9,7 @@ import { Heart, Fuel, Gauge } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import type { VehicleScore } from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
+import { authClient } from "@/lib/auth/client";
 
 interface CarCardProps {
   recommendation: VehicleScore;
@@ -19,6 +20,8 @@ export function CarCard({ recommendation }: CarCardProps) {
 
   const car = vehicle;
   const router = useRouter();
+  const session = authClient.useSession;
+  const user = session?.get().data?.user;
 
 
   return (
@@ -110,7 +113,7 @@ export function CarCard({ recommendation }: CarCardProps) {
                   variant="secondary"
                   className="bg-primary/10 hover:bg-primary/20"
                 >
-                  {feature}
+                  {feature == "safety-package" ? "Safety Package" : feature}
                 </Badge>
               ))}
             </div>

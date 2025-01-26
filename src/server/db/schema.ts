@@ -25,6 +25,7 @@ export const usersTable = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
+  likes: text("likes"),
 });
 
 export const sessionsTable = pgTable("sessions", {

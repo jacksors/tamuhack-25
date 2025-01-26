@@ -43,7 +43,7 @@ export function StyleRadar({ data }: StyleRadarProps) {
             dataKey="subject"
             tick={{ fill: "hsl(var(--muted-foreground))" }}
           />
-          <PolarRadiusAxis angle={30} domain={[0, 100]} />
+          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false}/>
           <Radar
             name="Style"
             dataKey="value"

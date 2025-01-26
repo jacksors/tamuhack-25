@@ -38,8 +38,6 @@ export function HeroCar({ recommendation }: HeroCarProps) {
           <CardContent className="p-0">
             <div className="grid gap-6 lg:grid-cols-2">
               <div className="group relative aspect-[4/3] lg:aspect-auto">
-                <div className="bg-dot-pattern absolute inset-0 opacity-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
                 <Spinner
                   colorCodes={car.colorCodes ?? ""}
                   model={car.model ?? ""}
@@ -155,7 +153,9 @@ export function HeroCar({ recommendation }: HeroCarProps) {
                         variant="outline"
                         className="bg-primary/10"
                       >
-                        {feature}
+                        {feature === "safety-package"
+                          ? "Safety Package"
+                          : feature}
                       </Badge>
                     ))}
                   </motion.div>
