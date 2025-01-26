@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Fuel, Gauge } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import Spinner from "@/components/Spinner";
 
 interface CarCardProps {
   car: any;
@@ -19,13 +20,8 @@ export function CarCard({ car }: CarCardProps) {
     >
       <Card className="group relative overflow-hidden border-2 bg-gradient-to-b from-background to-muted/20 transition-colors hover:border-primary/50">
         <CardContent className="p-0">
-          <div className="relative aspect-[4/3]">
-            <div className="absolute inset-0 z-10 bg-gradient-to-t from-background/80 to-background/0" />
-            <img
-              src={car.image || "/placeholder.svg?height=400&width=600"}
-              alt={`${car.year} ${car.make} ${car.model}`}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
+          <div className="flex aspect-[4/3] items-center">
+            <Spinner colorCodes={car.colorCodes} model={car.model} modelTag={car.modelTag} modelGrade={car.modelGrade} imageIndexOverride={35} imageCountOverride={car.imageCount} />
             <motion.div
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1 }}

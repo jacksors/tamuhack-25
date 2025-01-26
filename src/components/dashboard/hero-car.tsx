@@ -15,6 +15,7 @@ import {
   Star,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import Spinner from "@/components/Spinner";
 
 interface HeroCarProps {
   car: any;
@@ -35,11 +36,15 @@ export function HeroCar({ car, matchScore }: HeroCarProps) {
               <div className="group relative aspect-[4/3] lg:aspect-auto">
                 <div className="bg-dot-pattern absolute inset-0 opacity-10" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-                <img
-                  src={car.image || "/placeholder.svg?height=600&width=800"}
-                  alt={`${car.year} ${car.make} ${car.model}`}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                <Spinner
+                  colorCodes={car.colorCodes}
+                  model={car.model}
+                  modelTag={car.modelTag}
+                  modelGrade={car.modelGrade}
+                  imageIndexOverride={35}
+                  imageCountOverride={car.imageCount}
                 />
+
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}

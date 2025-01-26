@@ -191,6 +191,9 @@ export const vehiclesTable = pgTable("vehicles", {
   colorCodes: text("color_codes"),
   colorHexCodes: text("color_hex_codes"),
   modelGrade: text("model_grade"),
+  modelTag: text("model_tag"),
+  imageName: text("image_name"),
+  imageCount: integer("image_count"),
 });
 
 export const userPreferencesTable = pgTable("user_preferences", {
