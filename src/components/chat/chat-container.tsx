@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChatHeader } from "./chat-header";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
-import { Bot, Car } from "lucide-react";
+import { Bot } from "lucide-react";
+import { getRecommendations } from "@/app/actions/recommendations";
+import type { VehicleScore } from "@/lib/recommendations/types";
+import { CarCard } from "@/components/dashboard/car-card";
 
 export type Message = {
   id: string;
@@ -13,23 +16,65 @@ export type Message = {
   role: "user" | "assistant";
   timestamp: Date;
   status?: "sending" | "sent" | "error";
+  recommendation?: VehicleScore;
 };
 
 export function ChatContainer() {
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      content:
-        "Hi! I'm your Toyota AI assistant. I can help you explore our vehicles, answer questions about your recommendations, and provide detailed information about any Toyota model. What would you like to know?",
-      role: "assistant",
-      timestamp: new Date(),
-      status: "sent",
-    },
+    // Initial message will be set after recommendations are fetched
   ]);
-
+  const [recommendations, setRecommendations] = useState<VehicleScore[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  const addMessage = (content: string) => {
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const data = await getRecommendations();
+        setRecommendations(data);
+
+        // Set initial message with top recommendation
+        if (data.length > 0) {
+          setMessages([
+            {
+              id: "welcome",
+              content: `Hi! I'm your Toyota AI assistant. Based on your preferences, your top recommendation is the ${data[0]?.vehicle.year} ${data[0]?.vehicle.make} ${data[0]?.vehicle.model}. Would you like to explore other options or learn more about this one?`,
+              role: "assistant",
+              timestamp: new Date(),
+              status: "sent",
+              recommendation: data[0],
+            },
+          ]);
+        } else {
+          setMessages([
+            {
+              id: "welcome",
+              content:
+                "Hi! I'm your Toyota AI assistant. I'm ready to help you find your perfect Toyota. Tell me about your preferences, or ask me any questions you have.",
+              role: "assistant",
+              timestamp: new Date(),
+              status: "sent",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        setMessages([
+          {
+            id: "error",
+            content:
+              "There was an error fetching your recommendations. Please try again later.",
+            role: "assistant",
+            timestamp: new Date(),
+            status: "error",
+          },
+        ]);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  const addMessage = async (content: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       content,
@@ -41,18 +86,26 @@ export function ChatContainer() {
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Simulate AI response (this will be replaced with actual API call)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        content:
-          "I understand you're interested in Toyota vehicles. Let me help you with that.",
-        role: "assistant",
-        timestamp: new Date(),
-        status: "sent",
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsTyping(false);
+    // Simulate AI response with car recommendations
+    setTimeout(async () => {
+      try {
+        // Example: Show a random car card
+        const randomIndex = Math.floor(Math.random() * recommendations.length);
+        const recommendation = recommendations[randomIndex];
+
+        const assistantMessage: Message = {
+          id: `assistant-${Date.now()}`,
+          content: `Here's a vehicle you might like: the ${recommendation?.vehicle.year} ${recommendation?.vehicle.make} ${recommendation?.vehicle.model}.`,
+          role: "assistant",
+          timestamp: new Date(),
+          status: "sent",
+          recommendation,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } finally {
+        setIsTyping(false);
+      }
     }, 2000);
   };
 

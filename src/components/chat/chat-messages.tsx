@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bot, User } from "lucide-react";
 import type { Message } from "./chat-container";
 import { ChatTypingIndicator } from "./chat-typing-indicator";
+import { CarCard } from "@/components/dashboard/car-card";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -17,10 +18,14 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Scroll to bottom when messages change
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth", // Smooth scrolling for better UX
+      });
     }
-  }, [scrollRef.current]);
+  }, [messages]); // Removed isTyping from dependencies
 
   return (
     <ScrollArea ref={scrollRef} className="h-full px-4">
@@ -69,6 +74,15 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                 >
                   {message.content}
                 </div>
+                {/* Conditionally render CarCard */}
+                {message.recommendation && (
+                  <div className="max-w-[300px]">
+                    <CarCard
+                      recommendation={message.recommendation}
+                      detailsAvailable={false}
+                    />
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}

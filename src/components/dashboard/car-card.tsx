@@ -15,9 +15,10 @@ import type { User } from "@/lib/auth/index";
 
 interface CarCardProps {
   recommendation: VehicleScore;
+  detailsAvailable?: false;
 }
 
-export function CarCard({ recommendation }: CarCardProps) {
+export function CarCard({ recommendation, detailsAvailable }: CarCardProps) {
   const { vehicle, totalScore, metadata } = recommendation;
 
   const car = vehicle;
@@ -44,18 +45,22 @@ export function CarCard({ recommendation }: CarCardProps) {
             />
             <motion.div
               initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+              whileHover={{ opacity: detailsAvailable === undefined ? 1 : 0 }}
               className="absolute inset-0 z-20 flex items-center justify-center bg-primary/5 opacity-0 backdrop-blur-sm transition-opacity"
             >
-              <Button
-                variant="secondary"
-                className="bg-background/50 backdrop-blur-sm"
-                onClick={() => router.push(`/cars/${recommendation.vehicleId}`)}
-              >
-                View Details
-              </Button>
+              {detailsAvailable === undefined && (
+                <Button
+                  variant="secondary"
+                  className="bg-background/50 backdrop-blur-sm"
+                  onClick={() =>
+                    router.push(`/cars/${recommendation.vehicleId}`)
+                  }
+                >
+                  View Details
+                </Button>
+              )}
             </motion.div>
-            
+
             <Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
               {Math.round(totalScore)}% Match
             </Badge>
