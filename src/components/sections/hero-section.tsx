@@ -19,9 +19,6 @@ export function HeroSection() {
           </div>
           <div className="flex flex-col items-center gap-4 pt-4 sm:flex-row">
             <AnimatedCTA />
-            <Button variant="outline" size="lg">
-              Learn More
-            </Button>
           </div>
         </div>
       </div>
