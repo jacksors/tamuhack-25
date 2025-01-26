@@ -10,24 +10,19 @@ import {
   Sparkles,
   ChevronRight,
   Trophy,
+  Zap,
   Users,
   Wallet,
-  Zap,
 } from "lucide-react";
 import type { OnboardingData } from "@/types/onboarding";
 import { InsightCard } from "@/components/onboarding/insight-card";
 import { PreferenceChart } from "@/components/onboarding/preference-chart";
 import { StyleRadar } from "@/components/onboarding/style-radar";
 import { authClient } from "@/lib/auth/client";
-import { saveUserPreferences } from "@/app/actions/preferences";
-import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 
 export default function SummaryPage() {
-  const { toast } = useToast();
-  const router = useRouter();
   const [data, setData] = useState<Partial<OnboardingData>>({});
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
@@ -66,31 +61,14 @@ export default function SummaryPage() {
 
   const handleSignIn = async () => {
     try {
-      setIsSaving(true);
-      const signInResult = await authClient.signIn.social({
+      setIsSigningIn(true);
+      await authClient.signIn.social({
         provider: "google",
+        callbackURL: "/auth/callback",
       });
-
-      if (!signInResult.error) {
-        // Save preferences to database
-        await saveUserPreferences(data as any);
-        toast({
-          title: "Preferences saved!",
-          description:
-            "Your dream car preferences have been saved to your profile.",
-        });
-        router.push("/dashboard"); // Redirect to dashboard after saving
-      }
     } catch (error) {
       console.error("Error signing in:", error);
-      toast({
-        title: "Error",
-        description:
-          "There was a problem saving your preferences. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
+      setIsSigningIn(false);
     }
   };
 
@@ -144,7 +122,7 @@ export default function SummaryPage() {
               size="lg"
               className="group"
               onClick={handleSignIn}
-              disabled={isSaving}
+              disabled={isSigningIn}
             >
               <motion.div
                 className="flex items-center gap-2"
@@ -152,7 +130,7 @@ export default function SummaryPage() {
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <Sparkles className="h-5 w-5 transition-colors group-hover:text-yellow-400" />
-                {isSaving ? "Saving..." : "See Your Matches"}
+                {isSigningIn ? "Signing in..." : "See Your Matches"}
                 <ChevronRight className="h-4 w-4" />
               </motion.div>
             </Button>

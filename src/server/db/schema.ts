@@ -31,6 +31,7 @@ export const sessionsTable = pgTable("sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
+  token: text("token").notNull(),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
     mode: "date",
@@ -53,8 +54,15 @@ export const accountsTable = pgTable("accounts", {
   providerId: text("provider_id").notNull(),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
-  expiresAt: timestamp("expires_at"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  idToken: text("id_token"),
   password: text("password"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => new Date())
+    .notNull(),
 });
 
 export const verificationsTable = pgTable("verifications", {
@@ -134,7 +142,7 @@ export const vehiclesTable = pgTable("vehicles", {
   epaHighwayUtilityFactor: text("EPA highway utility factor"),
   hatchbackLuggageVolume: text("Hatchback luggage volume"),
   hatchbackPassengerVolume: text("Hatchback passenger volume"),
-  id: text("id"),
+  id: text("id").primaryKey(),
   "2DoorLuggageVolume": text("2 door luggage volume"),
   "4DoorLuggageVolume": text("4 door luggage volume"),
   mpgData: text("MPG Data"),
@@ -178,8 +186,11 @@ export const vehiclesTable = pgTable("vehicles", {
   phevCombined: text("PHEV Combined"),
   basemodel: text("basemodel"),
   msrp: doublePrecision("msrp"),
-  hasAnimation: boolean("hasAnimation"),
-  animationImageFolder: text("animationImageFolder"),
+  has3D: boolean("has3D"),
+  colorNames: text("color_names"),
+  colorCodes: text("color_codes"),
+  colorHexCodes: text("color_hex_codes"),
+  modelGrade: text("model_grade"),
 });
 
 export const userPreferencesTable = pgTable("user_preferences", {
