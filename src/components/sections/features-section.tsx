@@ -5,7 +5,7 @@ import { FeatureCard } from "@/components/ui/feature-card";
 
 export function FeaturesSection() {
   return (
-    <section className="py-20">
+    <section className="flex py-20 justify-center">
       <div className="container px-4 md:px-6">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tighter md:text-4xl">

@@ -31,6 +31,10 @@ export default function SummaryPage() {
     setData(savedData);
   }, []);
 
+  useEffect(() => {
+    console.log(data.features);
+  }, [data]);
+
   // Calculate driving style based on preferences
   const drivingStyle = {
     comfort:

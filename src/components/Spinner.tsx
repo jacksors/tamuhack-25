@@ -9,6 +9,8 @@ interface CarSpinnerProps {
   imageIndexOverride?: number;
   imageCountOverride?: number;
   card?: boolean;
+  noPadding?: boolean;
+  colorIndex?: number;
 }
 
 const CarSpinner: React.FC<CarSpinnerProps> = ({
@@ -19,6 +21,8 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
   imageIndexOverride,
   imageCountOverride,
   card,
+  noPadding,
+  colorIndex,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(10);
   const [isMouseInside, setIsMouseInside] = useState(false);
@@ -89,11 +93,18 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
     if (modelTag) {
       modelTagArray = modelTag.split(",").map((tag) => tag.trim());
     }
-    const randomIndex = Math.floor(Math.random() * colorCodeArray.length);
-    setRandomColor(colorCodeArray[randomIndex] || "");
-    setRandomModelGrade(modelGradeArray[randomIndex] || "");
-    setRandomModelTag(modelTagArray[randomIndex] || "");
-  }, [colorCodes, modelGrade, modelTag]);
+    if (colorIndex === undefined) {
+      const randomIndex = Math.floor(Math.random() * colorCodeArray.length);
+      setRandomColor(colorCodeArray[randomIndex] || "");
+      setRandomModelGrade(modelGradeArray[randomIndex] || "");
+      setRandomModelTag(modelTagArray[randomIndex] || "");
+    } else {
+      setRandomColor(colorCodeArray[colorIndex] || "");
+      setRandomModelGrade(modelGradeArray[colorIndex] || "");
+      setRandomModelTag(modelTagArray[colorIndex] || "");
+      console.log("colorIndex: ", colorIndex);
+    }
+  }, [colorCodes, modelGrade, modelTag, colorIndex]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     console.log("handleMouseMove");
@@ -127,7 +138,7 @@ const CarSpinner: React.FC<CarSpinnerProps> = ({
         <img
           src={`https://tmna.aemassets.toyota.com/is/image/toyota/toyota/jellies/max/${year}/${modelName}/${randomModelGrade}/${randomModelTag}/${randomColor}/${imageCount}/${currentImageIndex}.png?fmt=webp-alpha&wid=930&qlt=90`}
           alt="Spinning Car"
-          className={`${card ? "h-full w-full object-cover py-12" : "h-[50%]"} -translate-x-7`}
+          className={`${card ? "h-full w-full -translate-x-7" : "w-full"} object-cover ${!noPadding && card ? "py-12" : "py-5"}`}
         />
       )}
     </div>

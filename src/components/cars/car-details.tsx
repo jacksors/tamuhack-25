@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface CarDetailsProps {
 }
 
 export function CarDetails({ car }: CarDetailsProps) {
+  const [colorSelected, setColorSelected] = useState(0);
   const router = useRouter();
 
   return (
@@ -56,6 +58,7 @@ export function CarDetails({ car }: CarDetailsProps) {
             >
               <Spinner
                 colorCodes={car.vehicle.colorCodes ?? ""}
+                colorIndex={colorSelected}
                 model={car.vehicle.model ?? ""}
                 modelTag={car.vehicle.modelTag ?? ""}
                 modelGrade={car.vehicle.modelGrade ?? ""}
@@ -159,6 +162,57 @@ export function CarDetails({ car }: CarDetailsProps) {
                         <Calendar className="h-5 w-5 text-primary" />
                         <span className="font-medium">{car.vehicle.year}</span>
                       </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Colors</h2>
+                    <div className="flex flex-wrap gap-4">
+                      {car.vehicle.colorCodes
+                        ?.split(",")
+                        .map((color, index) => {
+                          const colorHexCodes =
+                            car.vehicle.colorHexCodes?.split(","); // Split once
+                          const colorHex = colorHexCodes
+                            ? colorHexCodes[index]?.trim()
+                            : null; // Ensure proper indexing
+
+                          if (!colorHex) return null; // Skip if no hex code is available
+
+                          // Check if the colorHex is a gradient
+                          const isGradient = colorHex.startsWith("(");
+                          const gradientColors = isGradient
+                            ? colorHex
+                                .replace("(", "")
+                                .replace(")", "")
+                                .split(" ")
+                                .map((code) => code.trim())
+                            : "000000"
+
+                          return isGradient ? (
+                            <div
+                              key={color + index}
+                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} outline-offset-2 transition-all`}
+                              onClick={() => setColorSelected(index)}
+                              style={{
+                                background: `linear-gradient(-45deg, #${gradientColors[0]} 50%, #${gradientColors[1]} 50%)`,
+                              }}
+                            ></div>
+                          ) : (
+                            <div
+                              key={color + index}
+                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} outline-offset-2 transition-all`}
+                              onClick={() => {
+                                setColorSelected(index);
+                              }}
+                              style={{
+                                backgroundColor: `#${colorHex}`,
+                              }}
+                            />
+                          );
+                        })}
                     </div>
                   </div>
 

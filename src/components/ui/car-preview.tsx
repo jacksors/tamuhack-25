@@ -4,20 +4,17 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car } from "lucide-react";
+import { Vehicle } from "@/lib/recommendations/types";
+import Spinner from "@/components/Spinner";
+import { formatCurrency } from "@/lib/utils";
 
 interface CarPreviewProps {
-  name: string;
-  price: string;
-  type: string;
-  image: string;
-  delay?: number;
+  car: Vehicle
+  delay?: number
 }
 
 export function CarPreview({
-  name,
-  price,
-  type,
-  image,
+  car,
   delay = 0,
 }: CarPreviewProps) {
   return (
@@ -30,19 +27,30 @@ export function CarPreview({
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="relative aspect-video">
-            <img
-              src={image || "/placeholder.svg"}
-              alt={name}
-              className="h-full w-full object-cover"
+            <Spinner
+              colorCodes={car.colorCodes ?? ""}
+              model={car.model ?? ""}
+              modelTag={car.modelTag ?? ""}
+              modelGrade={car.modelGrade ?? ""}
+              imageIndexOverride={35}
+              imageCountOverride={car.imageCount ?? 36}
+              card={true}
+              noPadding={true}
             />
-            <Badge className="absolute right-4 top-4">{price}</Badge>
+            <Badge className="absolute right-4 top-4">
+              {" "}
+              {formatCurrency(car.msrp || 0)}
+            </Badge>
           </div>
           <div className="p-4">
             <div className="mb-2 flex items-center gap-2">
               <Car className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">{type}</span>
+              <span className="text-sm text-muted-foreground">
+                {" "}
+                {car.vehicleSizeClass || "Mid-Size"}
+              </span>
             </div>
-            <h3 className="font-semibold">{name}</h3>
+            <h3 className="font-semibold">{car.year} {car.make} {car.model}</h3>
           </div>
         </CardContent>
       </Card>
