@@ -1,17 +1,21 @@
+import { AnimatedGradient } from "@/components/ui/animated-gradient";
+import { FloatingCars } from "@/components/ui/floating-cars";
 import { HeroSection } from "@/components/sections/hero-section";
-import { PreferencesSection } from "@/components/sections/preferences-section";
 import { FeaturesSection } from "@/components/sections/features-section";
-import { FeaturedCarsSection } from "@/components/sections/featured-cars-section";
-import { CTASection } from "@/components/sections/cta-section";
+import { ScreenshotsSection } from "@/components/sections/screenshots-section";
+import { TechStackSection } from "@/components/sections/tech-stack-section";
+import { TeamSection } from "@/components/sections/team-section";
 
-export default function LandingPage() {
+export default function HomePage() {
   return (
     <div className="min-h-screen">
+      <AnimatedGradient />
+      <FloatingCars />
       <HeroSection />
-      <PreferencesSection />
       <FeaturesSection />
-      <FeaturedCarsSection />
-      <CTASection />
+      <ScreenshotsSection />
+      <TechStackSection />
+      <TeamSection />
     </div>
   );
 }
