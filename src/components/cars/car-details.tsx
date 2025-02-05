@@ -193,7 +193,7 @@ export function CarDetails({ car }: CarDetailsProps) {
                           return isGradient ? (
                             <div
                               key={color + index}
-                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} outline-offset-2 transition-all`}
+                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} cursor-pointer outline-offset-2 transition-all`}
                               onClick={() => setColorSelected(index)}
                               style={{
                                 background: `linear-gradient(-45deg, #${gradientColors[0]} 50%, #${gradientColors[1]} 50%)`,
@@ -202,7 +202,7 @@ export function CarDetails({ car }: CarDetailsProps) {
                           ) : (
                             <div
                               key={color + index}
-                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} outline-offset-2 transition-all`}
+                              className={`h-8 w-8 rounded-full p-2 outline ${colorSelected === index ? "outline" : "outline-[0.5px]"} cursor-pointer outline-offset-2 transition-all`}
                               onClick={() => {
                                 setColorSelected(index);
                               }}

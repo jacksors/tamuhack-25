@@ -5,38 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "AppDB": {
-      "database": string
-      "host": string
-      "password": string
-      "port": number
-      "type": "sst.aws.Postgres"
-      "username": string
-    }
-    "BETTER_AUTH_SECRET": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "GOOGLE_CLIENT_ID": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "GOOGLE_CLIENT_SECRET": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "HackathonWeb": {
-      "type": "sst.aws.Nextjs"
-      "url": string
-    }
-    "OPENAI_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "aggietrack": {
-      "bastion": string
-      "type": "sst.aws.Vpc"
-    }
   }
 }
 /// <reference path="sst-env.d.ts" />

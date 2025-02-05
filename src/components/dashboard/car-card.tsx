@@ -7,11 +7,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Heart, Fuel, Gauge } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import type { VehicleScore } from "@/lib/recommendations/types";
+import type {
+  UserPreferences,
+  VehicleScore,
+} from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
 import { authClient } from "@/lib/auth/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { User } from "@/lib/auth/index";
+import { getUserPreferences } from "@/app/actions/preferences";
+import { nullableToOptional } from "@/lib/utils";
 
 interface CarCardProps {
   recommendation: VehicleScore;
@@ -25,6 +30,20 @@ export function CarCard({ recommendation, detailsAvailable }: CarCardProps) {
   const router = useRouter();
   const session = authClient.useSession;
   const user = session.get().data?.user as User;
+
+  const [preferences, setPreferences] = useState<
+    Partial<UserPreferences> | undefined
+  >(undefined);
+
+  useEffect(() => {
+    (async () => {
+      const preferences = nullableToOptional(await getUserPreferences());
+
+      if (preferences) {
+        setPreferences(preferences as Partial<UserPreferences>);
+      }
+    })();
+  }, []);
 
   return (
     <motion.div
@@ -71,7 +90,15 @@ export function CarCard({ recommendation, detailsAvailable }: CarCardProps) {
                 {car.year} {car.make} {car.model}
               </h3>
               <div className="text-2xl font-bold text-primary">
-                {formatCurrency(car.msrp || 0)}
+                {formatCurrency(
+                  preferences?.paymentPlan?.type === "cash"
+                    ? car.msrp || 0
+                    : (car.msrp || 0) / 48,
+                )}
+                {preferences?.paymentPlan?.type !== "cash" &&
+                  !!preferences?.paymentPlan?.type && (
+                    <span className="text-sm font-normal">/mo</span>
+                  )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">

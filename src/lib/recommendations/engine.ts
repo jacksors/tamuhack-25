@@ -50,8 +50,6 @@ export class RecommendationEngine {
     // Filter out vehicles with very low scores before sorting
     const viableScores = scores.filter((score) => score.totalScore > -1);
 
-    fs.writeFileSync("recs.json", JSON.stringify(viableScores));
-
     return viableScores.sort((a, b) => b.totalScore - a.totalScore);
   }
 

@@ -14,9 +14,14 @@ import {
   ArrowRight,
   Star,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import type { VehicleScore } from "@/lib/recommendations/types";
+import { formatCurrency, nullableToOptional } from "@/lib/utils";
+import type {
+  UserPreferences,
+  VehicleScore,
+} from "@/lib/recommendations/types";
 import Spinner from "@/components/Spinner";
+import { useEffect, useState } from "react";
+import { getUserPreferences } from "@/app/actions/preferences";
 
 interface HeroCarProps {
   recommendation: VehicleScore;
@@ -27,6 +32,20 @@ export function HeroCar({ recommendation }: HeroCarProps) {
 
   const car = vehicle;
   console.log("Car", car);
+
+  const [preferences, setPreferences] = useState<
+    Partial<UserPreferences> | undefined
+  >(undefined);
+
+  useEffect(() => {
+    (async () => {
+      const preferences = nullableToOptional(await getUserPreferences());
+
+      if (preferences) {
+        setPreferences(preferences as Partial<UserPreferences>);
+      }
+    })();
+  }, []);
 
   return (
     <div className="relative">
@@ -86,7 +105,15 @@ export function HeroCar({ recommendation }: HeroCarProps) {
                     transition={{ delay: 0.3 }}
                     className="text-3xl font-bold text-primary"
                   >
-                    {formatCurrency(car.msrp || 0)}
+                    {formatCurrency(
+                      preferences?.paymentPlan?.type === "cash"
+                        ? car.msrp || 0
+                        : (car.msrp || 0) / 48,
+                    )}
+                    {preferences?.paymentPlan?.type !== "cash" &&
+                      !!preferences?.paymentPlan?.type && (
+                        <span className="text-sm font-normal">/mo</span>
+                      )}
                   </motion.div>
                 </div>
 
@@ -166,18 +193,28 @@ export function HeroCar({ recommendation }: HeroCarProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="flex gap-4 pt-4 w-full"
+                  className="flex w-full gap-4 pt-4"
                 >
-                  <a href={car.url || "#"} target="_blank" rel="noreferrer" className="group flex-2 w-full">
-                    <Button className="group flex-1 w-full" size="lg">
+                  <a
+                    href={car.url || "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-2 group w-full"
+                  >
+                    <Button className="group w-full flex-1" size="lg">
                       Schedule Test Drive
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </a>
-                  <a href={car.url} target="_blank" rel="noreferrer" className="group flex-1 w-full">
-                  <Button variant="outline" size="icon" className="h-12 w-12">
-                    <Share2 className="h-5 w-5" />
-                  </Button>
+                  <a
+                    href={car.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group w-full flex-1"
+                  >
+                    <Button variant="outline" size="icon" className="h-12 w-12">
+                      <Share2 className="h-5 w-5" />
+                    </Button>
                   </a>
                 </motion.div>
               </div>

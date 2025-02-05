@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
+import { Vpc } from ".sst/platform/src/components/aws";
+
 export default $config({
   app(input) {
     return {
@@ -10,11 +12,17 @@ export default $config({
     };
   },
   async run() {
-    const vpc = new sst.aws.Vpc("aggietrack", {
-      bastion: true,
-      az: 2,
-      nat: "ec2",
-    });
+    const vpc =
+      $app.stage === "dev"
+        ? new sst.aws.Vpc("aggietrack", {
+            bastion: true,
+            az: 2,
+            nat: "ec2",
+          })
+        : sst.aws.Vpc.get(
+            "tamuhack-25-dev-aggietrack",
+            "vpc-006d4dfc841e59ec5",
+          );
 
     const appDb =
       $app.stage === "dev"
