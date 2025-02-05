@@ -38,8 +38,7 @@ const features = [
   {
     icon: Palette,
     title: "Beautiful Design",
-    description:
-      "Modern, responsive design with attention to detail and smooth animations",
+    description: "Modern, responsive design with smooth animations",
   },
 ];
 

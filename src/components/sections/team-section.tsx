@@ -2,29 +2,30 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Github, Linkedin } from "lucide-react";
+import { Github, Globe, Linkedin } from "lucide-react";
 import Link from "next/link";
 
 const teamMembers = [
   {
-    name: "Team Member 1",
+    name: "Aiden Stickney",
     role: "Full Stack Developer",
     image: "/team/member1.jpg",
     github: "https://github.com/member1",
     linkedin: "https://linkedin.com/in/member1",
+    website: "https://aidenstickney.com",
   },
   {
-    name: "Team Member 2",
-    role: "AI Engineer",
+    name: "Jackson Stone",
+    role: "Full Stack Developer",
     image: "/team/member2.jpg",
     github: "https://github.com/member2",
     linkedin: "https://linkedin.com/in/member2",
+    website: "https://jacksonstone.dev",
   },
   {
-    name: "Team Member 3",
+    name: "Theresia Heimer",
     role: "UI/UX Designer",
     image: "/team/member3.jpg",
-    github: "https://github.com/member3",
     linkedin: "https://linkedin.com/in/member3",
   },
 ];
@@ -38,11 +39,11 @@ export function TeamSection() {
             Meet the Team
           </h2>
           <p className="mx-auto max-w-[800px] text-muted-foreground md:text-lg">
-            The talented individuals behind DreamDrive who brought this project
-            to life in 24 hours.
+            The individuals behind DreamDrive who brought this project to life
+            in 24 hours.
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-3">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member.name}
@@ -67,13 +68,15 @@ export function TeamSection() {
                     {member.role}
                   </p>
                   <div className="flex justify-center gap-4">
-                    <Link
-                      href={member.github}
-                      target="_blank"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      <Github className="h-5 w-5" />
-                    </Link>
+                    {member.github && (
+                      <Link
+                        href={member.github}
+                        target="_blank"
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        <Github className="h-5 w-5" />
+                      </Link>
+                    )}
                     <Link
                       href={member.linkedin}
                       target="_blank"
@@ -81,6 +84,15 @@ export function TeamSection() {
                     >
                       <Linkedin className="h-5 w-5" />
                     </Link>
+                    {member.website && (
+                      <Link
+                        href={member.website}
+                        target="_blank"
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        <Globe className="h-5 w-5" />
+                      </Link>
+                    )}
                   </div>
                 </CardContent>
               </Card>

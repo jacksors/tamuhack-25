@@ -64,4 +64,8 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  section {
+    @apply flex flex-row items-center justify-center mx-auto;
+  }
 }
