@@ -9,24 +9,23 @@ const teamMembers = [
   {
     name: "Aiden Stickney",
     role: "Full Stack Developer",
-    image: "/team/member1.jpg",
-    github: "https://github.com/member1",
-    linkedin: "https://linkedin.com/in/member1",
-    website: "https://aidenstickney.com",
+    image: "/headshots/aiden.jpeg",
+    github: "https://github.com/aidenstickney",
+    linkedin: "https://linkedin.com/in/aidenstickney",
   },
   {
     name: "Jackson Stone",
     role: "Full Stack Developer",
-    image: "/team/member2.jpg",
-    github: "https://github.com/member2",
-    linkedin: "https://linkedin.com/in/member2",
+    image: "/headshots/jackson.jpeg",
+    github: "https://github.com/jacksors",
+    linkedin: "https://linkedin.com/in/jacksonrstone",
     website: "https://jacksonstone.dev",
   },
   {
     name: "Theresia Heimer",
     role: "UI/UX Designer",
-    image: "/team/member3.jpg",
-    linkedin: "https://linkedin.com/in/member3",
+    image: "/headshots/theresia.jpeg",
+    linkedin: "https://linkedin.com/in/theresia-heimer",
   },
 ];
 

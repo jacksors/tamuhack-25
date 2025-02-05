@@ -8,25 +8,25 @@ const screenshots = [
   {
     title: "Personalized Onboarding",
     description: "Interactive questionnaire to understand user preferences",
-    image: "/screenshots/onboarding.png",
+    image: "/showcase/analysis.jpg",
     tags: ["User Experience", "Animation"],
   },
   {
     title: "AI Chat Interface",
     description: "Natural conversation with Toyota AI Assistant",
-    image: "/screenshots/chat.png",
+    image: "/showcase/chat.png",
     tags: ["AI", "Interaction"],
   },
   {
     title: "Vehicle Recommendations",
     description: "Personalized vehicle matches with detailed analysis",
-    image: "/screenshots/recommendations.png",
+    image: "/showcase/match.jpg",
     tags: ["Matching", "Analysis"],
   },
   {
     title: "Vehicle Details",
     description: "In-depth vehicle information and comparison",
-    image: "/screenshots/details.png",
+    image: "/showcase/details.png",
     tags: ["Information", "UI"],
   },
 ];
