@@ -25,6 +25,7 @@ const teamMembers = [
     name: "Theresia Heimer",
     role: "UI/UX Designer",
     image: "/headshots/theresia.jpeg",
+    github: "https://github.com/wizardgamerftw",
     linkedin: "https://linkedin.com/in/theresia-heimer",
   },
 ];
